@@ -1,0 +1,2255 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGENDA LTDJ v2 - Soutenance DWWM - Mariami CHADUNELI</title>
+<style>
+  :root {
+    --navy:   #1e3a5f;
+    --navy2:  #16304f;
+    --accent: #3a8fd1;
+    --gold:   #f0a500;
+    --white:  #ffffff;
+    --light:  #e8f0f8;
+    --gray:   #8096b0;
+    --green:  #27ae60;
+    --red:    #e74c3c;
+    --orange: #e67e22;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0d1f33;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── FULLSCREEN ── */
+  /* html becomes the fullscreen element - fill it, center everything */
+  :fullscreen       { background: #000 !important; width: 100% !important; height: 100% !important; }
+  :-webkit-full-screen { background: #000 !important; width: 100% !important; height: 100% !important; }
+
+  :fullscreen body, :-webkit-full-screen body {
+    width: 100% !important; height: 100% !important;
+    display: flex !important;
+    align-items: center !important; justify-content: center !important;
+  }
+
+  /* Hide chrome in fullscreen */
+  :fullscreen #nav, :fullscreen #hint, :fullscreen #progress-bar,
+  :-webkit-full-screen #nav, :-webkit-full-screen #hint, :-webkit-full-screen #progress-bar {
+    display: none !important;
+  }
+
+  #fs-counter {
+    display: none; position: fixed; bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,.55); font-size: 22px; font-weight: 600;
+    z-index: 9999; pointer-events: none; letter-spacing: 1px;
+  }
+
+  /* ── LIGHTBOX ── */
+  #lightbox {
+    display: none; position: fixed; inset: 0; z-index: 99999;
+    background: rgba(0,0,0,.92); align-items: center; justify-content: center; cursor: zoom-out;
+  }
+  #lightbox.open { display: flex; }
+  #lightbox img, #lightbox video {
+    max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 60px rgba(0,0,0,.8);
+  }
+  #lightbox-close {
+    position: fixed; top: 16px; right: 22px; color: rgba(255,255,255,.6); font-size: 32px;
+    cursor: pointer; z-index: 100000; line-height: 1; user-select: none;
+  }
+  #lightbox-close:hover { color: #fff; }
+  .screenshot-zone.loaded { cursor: zoom-in; }
+  #logo-overlay, #logo-eni-overlay {
+    display: flex; align-items: center;
+  }
+  #logo-img, #logo-eni-img {
+    height: 40px; width: auto;
+    object-fit: contain; display: none;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,.5));
+    cursor: pointer;
+  }
+  #logo-placeholder, #logo-eni-placeholder {
+    border: 1px dashed rgba(255,255,255,.25);
+    border-radius: 6px; padding: 4px 8px;
+    color: rgba(255,255,255,.3); font-size: 9px;
+    cursor: pointer; letter-spacing: .5px;
+    transition: all .2s;
+  }
+  #logo-placeholder:hover  { border-color: var(--gold);   color: var(--gold); }
+  #logo-eni-placeholder:hover { border-color: var(--accent); color: var(--accent); }
+  #logo-input, #logo-eni-input { display: none; }
+  #logo-overlay.has-logo    #logo-placeholder     { display: none; }
+  #logo-overlay.has-logo    #logo-img             { display: block; }
+  #logo-eni-overlay.has-logo #logo-eni-placeholder { display: none; }
+  #logo-eni-overlay.has-logo #logo-eni-img         { display: block; }
+
+  /* ── SLIDE CONTAINER ── */
+  #deck {
+    width: 960px; height: 540px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .slide {
+    display: none;
+    width: 960px; height: 540px;
+    background: var(--navy);
+    color: var(--white);
+    padding: 44px 52px 32px;
+    position: absolute; top:0; left:0;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+
+  /* ── HEADER STRIPE ── */
+  .slide-header {
+    border-left: 5px solid var(--gold);
+    padding-left: 14px;
+    margin-bottom: 22px;
+  }
+  .slide-header h1 {
+    font-size: 26px; font-weight: 700;
+    color: var(--white); line-height: 1.2;
+  }
+  .slide-header .subtitle {
+    font-size: 13px; color: var(--gray);
+    margin-top: 4px; letter-spacing: .5px;
+  }
+
+  /* ── TITLE SLIDE ── */
+  .slide-title {
+    background: linear-gradient(135deg, var(--navy2) 0%, #1a3a6e 100%);
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .slide-title .logo-line {
+    font-size: 11px; letter-spacing: 3px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 18px;
+  }
+  .slide-title h1 {
+    font-size: 42px; font-weight: 800; color: var(--white);
+    line-height: 1.1; margin-bottom: 8px;
+  }
+  .slide-title .tagline {
+    font-size: 15px; color: var(--light); margin-bottom: 28px;
+  }
+  .slide-title .divider {
+    width: 60px; height: 3px; background: var(--gold);
+    margin: 0 auto 28px;
+  }
+  .slide-title .meta {
+    font-size: 13px; color: var(--gray); line-height: 1.8;
+  }
+  .slide-title .meta strong { color: var(--white); }
+
+  /* ── CONTENT HELPERS ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-height: 0; flex: 1; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; min-height: 0; flex: 1; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th {
+    background: rgba(255,255,255,.1);
+    padding: 7px 10px; text-align: left;
+    color: var(--gold); font-size: 11px; letter-spacing:.5px;
+    text-transform: uppercase;
+  }
+  td { padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,.07); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── CODE BLOCK ── */
+  pre {
+    background: rgba(0,0,0,.4);
+    border-radius: 6px; border-left: 3px solid var(--accent);
+    padding: 12px 14px; font-size: 10.5px; line-height: 1.55;
+    color: #c8deff;
+    overflow-y: auto; overflow-x: auto;
+    max-height: 390px;
+    font-family: 'Cascadia Code','Consolas','Fira Mono', monospace;
+    flex-shrink: 1; min-height: 0;
+  }
+  pre::-webkit-scrollbar { width: 4px; height: 4px; }
+  pre::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 2px; }
+  .kw { color: #79b8ff; }
+  .fn { color: #b392f0; }
+  .str { color: #9ecbff; }
+  .cmt { color: #6a737d; font-style: italic; }
+  .num { color: #79b8ff; }
+  .hl  { background: rgba(248,231,28,.12); display: block; }
+
+  /* ── BADGE / PILL ── */
+  .badge {
+    display: inline-block; padding: 3px 9px; border-radius: 12px;
+    font-size: 10px; font-weight: 700; letter-spacing:.3px;
+  }
+  .badge-green  { background: rgba(39,174,96,.25);  color: #2ecc71; }
+  .badge-red    { background: rgba(231,76,60,.25);  color: #e74c3c; }
+  .badge-blue   { background: rgba(58,143,209,.25); color: #5dade2; }
+  .badge-gold   { background: rgba(240,165,0,.25);  color: var(--gold); }
+  .badge-gray   { background: rgba(255,255,255,.1); color: var(--gray); }
+
+  .stack-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .stack-head h3 {
+    margin-bottom: 0;
+  }
+  .stack-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: .95;
+  }
+  .stack-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .card h3 { font-size: 13px; color: var(--gold); margin-bottom: 7px; }
+  .card p, .card li { font-size: 12px; color: var(--light); line-height: 1.6; }
+  .card ul { padding-left: 16px; }
+
+  /* ── LIST ── */
+  ul.check { list-style: none; padding: 0; }
+  ul.check li { font-size: 12.5px; color: var(--light); padding: 3px 0; padding-left: 20px; position: relative; }
+  ul.check li::before { content: '✓'; color: var(--green); position: absolute; left: 0; }
+  ul.cross li::before { content: '✗'; color: var(--red); }
+  ul.arrow li::before { content: '→'; color: var(--accent); }
+
+  /* ── PROBLEM BOX ── */
+  .problem-box {
+    background: rgba(231,76,60,.12);
+    border: 1px solid rgba(231,76,60,.3);
+    border-left: 4px solid var(--red);
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 10px;
+  }
+  .problem-box .label { font-size: 9px; color: var(--red); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 3px; }
+  .problem-box p { font-size: 12px; color: var(--light); }
+
+  .goal-box {
+    background: rgba(39,174,96,.1);
+    border: 1px solid rgba(39,174,96,.25);
+    border-left: 4px solid var(--green);
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 8px;
+  }
+  .goal-box .label { font-size: 9px; color: var(--green); letter-spacing:1px; text-transform: uppercase; margin-bottom: 3px; }
+  .goal-box p { font-size: 12px; color: var(--light); }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow { display: flex; flex-direction: column; gap: 4px; }
+  .flow-step {
+    background: rgba(255,255,255,.07);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 5px 5px 0;
+    padding: 7px 12px; font-size: 12px;
+  }
+  .flow-arrow { text-align: center; color: var(--accent); font-size: 14px; line-height: 1; }
+  .flow-fork { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .flow-validated { border-left-color: var(--green); }
+  .flow-waiting   { border-left-color: var(--gold); }
+
+  /* ── OWASP TABLE ── */
+  .owasp-row td:first-child { color: var(--red); font-weight: 700; font-size: 11px; }
+  .owasp-row td:nth-child(2) { color: #ffc ;}
+  .owasp-row td:nth-child(3) { color: var(--light); }
+  .owasp-row td:nth-child(4) { color: var(--green); font-size: 11px; }
+
+  /* ── TEST TABLE ── */
+  .test-ok  { color: var(--green); font-weight: 700; }
+  .test-num { color: var(--gold); font-weight: 700; }
+
+  /* ── SLIDE NUMBER + NAV ── */
+  #nav {
+    display: flex; align-items: center; gap: 16px; margin-top: 16px;
+  }
+  #nav button {
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    color: #fff; padding: 8px 20px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; transition: background .2s;
+  }
+  #nav button:hover { background: rgba(255,255,255,.2); }
+  #counter { color: var(--gray); font-size: 24px; min-width: 80px; text-align: center; font-weight: 600; }
+  #progress-bar {
+    width: 960px; height: 3px; background: rgba(255,255,255,.1);
+    border-radius: 2px; margin-top: 8px;
+  }
+  #progress-fill {
+    height: 3px; background: var(--gold); border-radius: 2px;
+    transition: width .3s ease;
+  }
+  #hint { color: var(--gray); font-size: 11px; margin-top: 6px; }
+
+  /* ── SLIDE-SPECIFIC DECORATIONS ── */
+  .accent-line {
+    width: 100%; height: 1px; background: rgba(255,255,255,.1);
+    margin: 12px 0;
+  }
+  .tag {
+    display: inline-block; background: rgba(58,143,209,.2);
+    color: var(--accent); font-size: 10px; padding: 2px 7px;
+    border-radius: 4px; font-weight: 600; margin-right: 4px;
+  }
+
+  .highlight-box {
+    background: rgba(58,143,209,.12);
+    border: 1px solid rgba(58,143,209,.3);
+    border-radius: 6px; padding: 10px 14px; margin-top: 10px;
+  }
+  .highlight-box p { font-size: 12px; color: var(--light); }
+  .highlight-box .label { font-size: 9px; color: var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+
+  .stat { text-align: center; padding: 10px; }
+  .stat .number { font-size: 30px; font-weight: 800; color: var(--gold); }
+  .stat .label  { font-size: 11px; color: var(--gray); margin-top: 2px; }
+
+  /* ── SLIDE 7 ARCH FLOW ── */
+  .arch-row {
+    display: flex; align-items: center; gap: 0; margin-bottom: 6px;
+  }
+  .arch-box {
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; padding: 7px 12px; font-size: 11.5px;
+    min-width: 140px; text-align: center;
+  }
+  .arch-box .layer { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; }
+  .arch-box .comp  { font-size: 12px; color: var(--white); font-weight: 600; margin-top: 2px; }
+  .arch-arrow { color: var(--accent); font-size: 18px; padding: 0 8px; }
+
+  /* scroll for overflowing slides */
+  .scroll-y { overflow-y: auto; max-height: 420px; padding-right: 4px; }
+  .scroll-y::-webkit-scrollbar { width: 4px; }
+  .scroll-y::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 2px; }
+
+  /* ── SCREENSHOT PLACEHOLDER ── */
+  .screenshot-zone {
+    border: 2px dashed rgba(240,165,0,.5);
+    border-radius: 8px;
+    background: rgba(240,165,0,.05);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: var(--gold); font-size: 11px; text-align: center;
+    padding: 10px; position: relative; overflow: hidden;
+    cursor: pointer; transition: background .2s;
+  }
+  .screenshot-zone:hover { background: rgba(240,165,0,.1); }
+  .screenshot-zone .sz-icon { font-size: 28px; margin-bottom: 6px; }
+  .screenshot-zone .sz-label { font-weight: 700; font-size: 12px; margin-bottom: 3px; }
+  .screenshot-zone .sz-hint  { font-size: 10px; color: var(--gray); }
+  .screenshot-zone.loaded .sz-icon,
+  .screenshot-zone.loaded .sz-label,
+  .screenshot-zone.loaded .sz-hint { display: none; }
+  .screenshot-zone img,
+  .screenshot-zone video {
+    position: absolute; top:0; left:0;
+    width:100%; height:100%; object-fit:cover;
+    border-radius: 8px;
+  }
+  .screenshot-zone input[type=file] {
+    position: absolute; inset:0; opacity:0; cursor:pointer; z-index: 2;
+  }
+  .sz-fullscreen-btn {
+    display: none; position: absolute; top: 6px; right: 6px; z-index: 3;
+    background: rgba(0,0,0,.55); border: none; color: #fff; font-size: 14px;
+    border-radius: 5px; padding: 3px 7px; cursor: pointer; line-height: 1;
+  }
+  .screenshot-zone.loaded .sz-fullscreen-btn { display: block; }
+  .screenshot-zone.loaded { cursor: default; }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- Logos haut droit : ENI + entreprise côte à côte -->
+  <div style="position:absolute;top:12px;right:14px;z-index:101;display:flex;align-items:center;gap:10px">
+
+    <div id="logo-eni-overlay">
+      <img id="logo-eni-img" src="" alt="Logo ENI" onclick="document.getElementById('logo-eni-input').click()">
+      <span id="logo-eni-placeholder" onclick="document.getElementById('logo-eni-input').click()">+ Logo ENI</span>
+      <input id="logo-eni-input" type="file" accept="image/*" onchange="loadLogoEni(this)">
+    </div>
+
+    <div id="logo-overlay">
+      <img id="logo-img" src="" alt="Logo" onclick="document.getElementById('logo-input').click()">
+      <span id="logo-placeholder" onclick="document.getElementById('logo-input').click()">+ Logo entreprise</span>
+      <input id="logo-input" type="file" accept="image/*" onchange="loadLogo(this)">
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 1 - TITRE -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-title active">
+    <div class="logo-line">Soutenance DWWM - RNCP 37674</div>
+    <h1>AGENDA LTDJ v2</h1>
+    <div class="tagline">Refonte de la plateforme de gestion événementielle</div>
+    <div class="divider"></div>
+    <div class="meta">
+      <strong>Mariami CHADUNELI</strong><br>
+      Candidate Développeur Web et Web Mobile<br>
+      <br>
+      Le Temple du Jeu<br>
+      Stage du 5 mai au 27 juin 2025
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 2 - PLAN DE PRESENTATION -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">PLAN</div>
+      <h1>Plan de présentation</h1>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-content:center">
+      <div class="card" style="padding:22px 24px">
+        <p style="font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">01</p>
+        <p style="font-size:20px;color:var(--white);font-weight:700;margin-bottom:8px">Contexte</p>
+        <p style="font-size:12px;color:var(--gray);line-height:1.7">Entreprise, historique<br>Agenda V1 &amp; démo</p>
+      </div>
+      <div class="card" style="padding:22px 24px">
+        <p style="font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">02</p>
+        <p style="font-size:20px;color:var(--white);font-weight:700;margin-bottom:8px">Analyse</p>
+        <p style="font-size:12px;color:var(--gray);line-height:1.7">Problèmes identifiés<br>Mission &amp; arborescence</p>
+      </div>
+      <div class="card" style="padding:22px 24px">
+        <p style="font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">03</p>
+        <p style="font-size:20px;color:var(--white);font-weight:700;margin-bottom:8px">Architecture</p>
+        <p style="font-size:12px;color:var(--gray);line-height:1.7">Stack technique, MVC<br>Rôles &amp; parcours</p>
+      </div>
+      <div class="card" style="padding:22px 24px">
+        <p style="font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">04</p>
+        <p style="font-size:20px;color:var(--white);font-weight:700;margin-bottom:8px">Conception</p>
+        <p style="font-size:12px;color:var(--gray);line-height:1.7">Maquettes Figma<br>Desktop &amp; mobile</p>
+      </div>
+      <div class="card" style="padding:22px 24px">
+        <p style="font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">05</p>
+        <p style="font-size:20px;color:var(--white);font-weight:700;margin-bottom:8px">Développement</p>
+        <p style="font-size:12px;color:var(--gray);line-height:1.7">Front-end, BDD<br>Back-end PHP/PDO</p>
+      </div>
+      <div class="card" style="padding:22px 24px">
+        <p style="font-size:11px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">06</p>
+        <p style="font-size:20px;color:var(--white);font-weight:700;margin-bottom:8px">Application</p>
+        <p style="font-size:12px;color:var(--gray);line-height:1.7">Démo, sécurité, tests<br>Veille &amp; bilan</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 3 - ENTREPRISE (HISTOIRE + CARTE) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONTEXTE</div>
+      <h1>Le Temple du Jeu : Histoire &amp; implantation</h1>
+    </div>
+    <div class="two-col"style="flex:1;min-height:0;align-items:center">
+      <div style="display:flex;flex-direction:column;justify-content:center">
+        <p style="font-size:10px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;font-weight:700">Histoire</p>
+        <div class="flow" style="font-size:16px;margin-bottom:10px;gap:10px">
+          <div class="flow-step" style="font-size:16px"><strong>1995</strong> - Fondation à Nantes</div>
+          <div class="flow-step" style="font-size:16px"><strong>2000s</strong> - Expansion dans le Grand Ouest</div>
+          <div class="flow-step" style="font-size:16px"><strong>2010s</strong> - Tournois officiels et réseau de boutiques</div>
+        </div>
+      </div>
+      <div style="height:390px">
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-label" style="font-size:22px">Carte des boutiques LTDJ</div>
+          <div class="sz-hint" style="font-size:15px">Charger une capture de la carte du réseau</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 4 - ENTREPRISE (INFOS CLES) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONTEXTE</div>
+      <h1>Le Temple du Jeu - Informations clés</h1>
+    </div>
+    <div class="two-col" style="align-items:stretch;flex:1;gap:28px">
+
+      <!-- COLONNE GAUCHE -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Chiffres clés en grille 2×2 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="card" style="text-align:center;padding:12px 8px">
+            <div style="font-size:28px;font-weight:800;color:var(--gold);line-height:1">10</div>
+            <div style="font-size:12px;color:var(--light);margin-top:4px">boutiques<br>Grand Ouest</div>
+          </div>
+          <div class="card" style="text-align:center;padding:12px 8px">
+            <div style="font-size:28px;font-weight:800;color:var(--gold);line-height:1">~40</div>
+            <div style="font-size:12px;color:var(--light);margin-top:4px">collaborateurs</div>
+          </div>
+          <div class="card" style="text-align:center;padding:12px 8px">
+            <div style="font-size:28px;font-weight:800;color:var(--gold);line-height:1">15 000+</div>
+            <div style="font-size:12px;color:var(--light);margin-top:4px">références<br>catalogue</div>
+          </div>
+          <div class="card" style="text-align:center;padding:12px 8px">
+            <div style="font-size:28px;font-weight:800;color:var(--gold);line-height:1">100+</div>
+            <div style="font-size:12px;color:var(--light);margin-top:4px">tournois<br>par mois</div>
+          </div>
+        </div>
+
+        <!-- Jeux organisés -->
+        <div class="card" style="flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:16px;margin-bottom:8px">Jeux organisés</h3>
+          <p style="font-size:15px;color:var(--light)">Magic · Pokémon · Yu-Gi-Oh! · Lorcana · jeux de société · figurines</p>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+
+        <!-- Encadrement -->
+        <div class="card" style="flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:16px;margin-bottom:12px">Encadrement stage</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+            <div>
+              <div style="font-size:15px;font-weight:700">Antonin Marchal</div>
+              <div style="font-size:13px;color:var(--light)">Lead Tech - maître de stage</div>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:700">Baptiste Rautureau</div>
+              <div style="font-size:13px;color:var(--light)">Développeur - mentor technique</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mon service -->
+        <div class="card" style="flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center">
+          <h3 style="font-size:16px;margin-bottom:12px">Mon service</h3>
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px">Pôle Développement & Informatique</div>
+          <p style="font-size:14px;color:var(--light)">Autonomie complète sur AGENDA LTDJ v2<br>de l'analyse du besoin jusqu'à la livraison</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 5- AGENDA LTDJ V1 (EXISTANT) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONTEXTE</div>
+      <h1>Agenda LTDJ : fonctionnement actuel</h1>
+    </div>
+
+    <div style="flex:1;display:flex;align-items:center;justify-content:center">
+      <div style="display:grid;
+                  grid-template-columns:auto 40px auto 40px auto 60px auto;
+                  grid-template-rows:auto auto auto;
+                  align-items:center;
+                  row-gap:8px;
+                  column-gap:0;
+                  justify-items:center">
+
+        <!-- col1 row1 : Manager -->
+        <div class="card" style="grid-column:1;grid-row:1;border-color:rgba(58,143,209,.6);padding:14px 18px">
+          <h3 style="margin-bottom:6px;color:var(--accent);font-size:15px;text-align:center">Manager</h3>
+          <ul style="font-size:13px;line-height:1.7;color:var(--light);list-style:disc;padding-left:16px;margin:0;white-space:nowrap">
+            <li>Publie les événements</li>
+            <li>Gère les inscriptions</li>
+          </ul>
+        </div>
+
+        <!-- col2 row1 : → Publie -->
+        <div style="grid-column:2;grid-row:1;text-align:center">
+          <div style="font-size:22px;color:var(--gold)">→</div>
+          <div style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">Publie</div>
+        </div>
+
+        <!-- col3 row1 : Google Calendar -->
+        <div style="grid-column:3;grid-row:1;border:2px dashed rgba(234,67,53,.55);border-radius:10px;padding:14px 18px;background:rgba(234,67,53,.05);text-align:center">
+          <div style="font-size:15px;font-weight:700;color:#f28b82;margin-bottom:4px">Google Calendar</div>
+          <div style="font-size:11px;color:var(--light);margin-bottom:8px">Source externe non maîtrisée</div>
+          <span style="background:rgba(234,67,53,.12);border:1px solid rgba(234,67,53,.35);border-radius:5px;padding:3px 9px;font-size:11px;color:#f28b82;white-space:nowrap">UID sync en dur</span>
+        </div>
+
+        <!-- col4 row1 : → AJAX -->
+        <div style="grid-column:4;grid-row:1;text-align:center">
+          <div style="font-size:22px;color:var(--gold)">→</div>
+          <div style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">AJAX pull</div>
+        </div>
+
+        <!-- col5 row1 : agenda.ltdj.fr -->
+        <div class="card" style="grid-column:5;grid-row:1;border-color:rgba(39,174,96,.55);padding:14px 18px">
+          <h3 style="margin-bottom:6px;color:var(--green);font-size:15px;text-align:center">agenda.ltdj.fr</h3>
+          <ul style="font-size:13px;line-height:1.7;color:var(--light);list-style:disc;padding-left:16px;margin:0 0 8px 0;white-space:nowrap">
+            <li>Calendrier événements</li>
+            <li>Pré-inscriptions</li>
+            <li>Liste d'attente</li>
+          </ul>
+          <span style="background:rgba(58,143,209,.12);border:1px solid rgba(58,143,209,.35);border-radius:5px;padding:3px 9px;font-size:11px;color:#a8d4f5;white-space:nowrap">⚙️ CodeIgniter</span>
+        </div>
+
+        <!-- col6 row1 : ← flèche + consulte -->
+        <div style="grid-column:6;grid-row:1;text-align:center;align-self:center">
+          <div style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">Consulte</div>
+          <div style="font-size:22px;color:var(--gold)">←</div>
+        </div>
+
+        <!-- col7 row1 : Joueur -->
+        <div style="grid-column:7;grid-row:1;display:flex;flex-direction:column;align-items:center">
+          <div class="card" style="padding:12px 14px;width:fit-content">
+            <h3 style="margin-bottom:4px;font-size:13px;text-align:center">Joueur</h3>
+            <ul style="font-size:11px;line-height:1.6;color:var(--light);list-style:disc;padding-left:14px;margin:0 0 6px 0;white-space:nowrap">
+              <li>Consulte l'agenda</li>
+              <li>Se pré-inscrit</li>
+            </ul>
+            <span style="background:rgba(58,143,209,.12);border:1px solid rgba(58,143,209,.35);border-radius:5px;padding:2px 8px;font-size:10px;color:#a8d4f5;white-space:nowrap">POST form</span>
+          </div>
+        </div>
+
+        <!-- col7 row2 : ↓ Règlement -->
+        <div style="grid-column:7;grid-row:2;text-align:center">
+          <div style="font-size:18px;color:var(--gold);line-height:1">↓</div>
+          <div style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">Règlement sur place</div>
+        </div>
+
+        <!-- col7 row3 : Boutique -->
+        <div class="card" style="grid-column:7;grid-row:3;border-color:rgba(240,165,0,.4);padding:14px 18px;text-align:center">
+          <h3 style="margin-bottom:6px;color:var(--gold);font-size:15px">Boutique</h3>
+          <p style="font-size:13px;color:var(--light);white-space:nowrap;margin:0">Paiement en caisse<br>confirmation de la place</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 6- AGENDA LTDJ V1 (EXISTANT) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONTEXTE</div>
+      <h1>Version actuelle du site - Démo vidéo</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;flex:1;min-height:0">
+      <div style="height:380px">
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">Vidéo de la version actuelle</div>
+          <div class="sz-hint">Cliquer pour charger un MP4/WebM ou une capture écran</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--light);text-align:center">État actuel du site avant la refonte v2.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 7 - BESOINS -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">ANALYSE</div>
+      <h1>Problèmes identifiés sur la v1</h1>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:center">
+      <div class="problem-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px">Dette technique</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>CodeIgniter vieillissant, sans évolution possible</li>
+          <li>Calendrier Google intégré en dur via AJAX + UID</li>
+          <li>Interface non responsive (usage mobile limité)</li>
+          <li>Code non maintenable, zéro modularité</li>
+        </ul>
+      </div>
+      <div class="problem-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px">Absence de synergie</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Aucune liaison agenda / base clients</li>
+          <li>Pas de compte joueur</li>
+          <li>Pas de dashboard manager</li>
+        </ul>
+      </div>
+      <div class="problem-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px">Logistique défaillante</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Désistements et listes d'attente gérés à la main</li>
+          <li>Émargement sur papier</li>
+          <li>Aucune automatisation des crédits Templix</li>
+        </ul>
+      </div>
+      <div class="problem-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px">Confidentialité absente</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Noms des inscrits visibles dans le HTML public</li>
+          <li>Zéro authentification</li>
+          <li>Aucun cloisonnement des données par rôle</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 8- MISSION (ce qu'il fallait construire) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">ANALYSE</div>
+      <h1>Ce qu'il fallait construire</h1>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:center">
+
+      <div class="goal-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px;color:var(--green)">Espace joueur sécurisé</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Compte personnel, profil</li>
+          <li>Historique des tournois</li>
+          <li>Solde Templix</li>
+        </ul>
+      </div>
+
+      <div class="goal-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px;color:var(--green)">Inscription aux tournois </div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>E-paiement sécurisé</li>
+          <li>Inscription automatique si annulation</li>
+          <li>Liste d'attente FIFO - Ordre garanti (premier arrivé, premier servi)</li>
+        </ul>
+      </div>
+
+      <div class="goal-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px;color:var(--green)">Dashboard manager</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Créer / modifier des tournois</li>
+          <li>Voir les inscrits, valider les présences</li>
+        </ul>
+      </div>
+
+      <div class="goal-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px;color:var(--green)">Émargement QR & crédits Templix</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Scan QR à l'entrée ou bouton "présent"</li>
+          <li>Crédits Templix attribués automatiquement</li>
+        </ul>
+      </div>
+
+      <div class="goal-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px;color:var(--green)">Sécurité OWASP + PHP 8.2 natif</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>PDO préparé, CSRF, bcrypt, sessions sécurisées</li>
+          <li>Architecture MVC sans framework</li>
+        </ul>
+      </div>
+
+      <div class="goal-box" style="padding:18px 20px">
+        <div class="label" style="font-size:12px;margin-bottom:8px;color:var(--green)">Interface responsive</div>
+        <ul style="font-size:12.5px;line-height:1.9;color:var(--light);list-style:disc;padding-left:18px;margin:0">
+          <li>Utilisable sur mobile en boutique</li>
+          <li>Compatible desktop à la maison</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 9- SCHÉMA PROJET V2 -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">ANALYSE</div>
+      <h1>Agenda LTDJ v2 : nouveau fonctionnement</h1>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+
+      <!-- Main flow: Admin + Manager → agenda v2 ← Joueur -->
+      <div style="display:grid;grid-template-columns:auto 44px auto 44px auto 60px auto;align-items:center;column-gap:0">
+
+        <!-- Admin -->
+        <div class="card" style="grid-column:1;border-color:rgba(231,76,60,.5);padding:12px 16px">
+          <h3 style="margin-bottom:6px;color:#e74c3c;font-size:14px;text-align:center">Admin</h3>
+          <ul style="font-size:12px;line-height:1.7;color:var(--light);list-style:disc;padding-left:14px;margin:0;white-space:nowrap">
+            <li>Gère les managers</li>
+            <li>Gère les boutiques</li>
+            <li>Analytics réseau</li>
+          </ul>
+        </div>
+
+        <!-- → Gère -->
+        <div style="grid-column:2;text-align:center">
+          <div style="font-size:20px;color:var(--gold)">→</div>
+          <div style="font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">Gère</div>
+        </div>
+
+        <!-- Manager -->
+        <div class="card" style="grid-column:3;border-color:rgba(58,143,209,.6);padding:12px 16px">
+          <h3 style="margin-bottom:6px;color:var(--accent);font-size:14px;text-align:center">Manager</h3>
+          <ul style="font-size:12px;line-height:1.7;color:var(--light);list-style:disc;padding-left:14px;margin:0;white-space:nowrap">
+            <li>Crée les tournois</li>
+            <li>Valide les présences</li>
+            <li>Analytics boutique</li>
+          </ul>
+        </div>
+
+        <!-- → Publie -->
+        <div style="grid-column:4;text-align:center">
+          <div style="font-size:20px;color:var(--gold)">→</div>
+          <div style="font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">Publie</div>
+        </div>
+
+        <!-- agenda.ltdj.fr v2 -->
+        <div class="card" style="grid-column:5;border-color:rgba(39,174,96,.55);padding:12px 16px">
+          <h3 style="margin-bottom:6px;color:var(--green);font-size:14px;text-align:center">agenda.ltdj.fr v2</h3>
+          <ul style="font-size:12px;line-height:1.7;color:var(--light);list-style:disc;padding-left:14px;margin:0;white-space:nowrap">
+            <li>Calendrier &amp; inscription</li>
+            <li>Comptes &amp; rôles</li>
+            <li>QR check-in &amp; Templix</li>
+          </ul>
+        </div>
+
+        <!-- ← Consulte -->
+        <div style="grid-column:6;text-align:center">
+          <div style="font-size:8px;color:var(--gray);text-transform:uppercase;letter-spacing:.3px">Consulte</div>
+          <div style="font-size:20px;color:var(--gold)">←</div>
+        </div>
+
+        <!-- Joueur -->
+        <div class="card" style="grid-column:7;padding:12px 16px">
+          <h3 style="margin-bottom:6px;font-size:14px;text-align:center">Joueur</h3>
+          <ul style="font-size:12px;line-height:1.7;color:var(--light);list-style:disc;padding-left:14px;margin:0;white-space:nowrap">
+            <li>S'inscrit en ligne</li>
+            <li>E-paiement en ligne</li>
+            <li>Reçoit QR code</li>
+            <li>Solde Templix</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Bottom row: Google Calendar tombstone (left) + Boutique grayed (right) -->
+      <div style="display:flex;gap:20px;align-items:center">
+
+        <!-- Google Calendar supprimé -->
+        <div style="display:flex;align-items:center;gap:12px;border:2px dashed rgba(128,150,176,.25);border-radius:10px;padding:8px 18px;background:rgba(128,150,176,.04);opacity:.5">
+          <div style="font-size:18px"></div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--gray);text-decoration:line-through">Google Calendar</div>
+            <div style="font-size:10px;color:var(--gray)">Remplacé par BDD interne</div>
+          </div>
+          <span style="background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);border-radius:5px;padding:2px 8px;font-size:10px;color:#e77;white-space:nowrap;margin-left:6px">✕ Supprimé</span>
+        </div>
+
+        <!-- Boutique grisée -->
+        <div style="display:flex;align-items:center;gap:12px;border:2px dashed rgba(128,150,176,.25);border-radius:10px;padding:8px 18px;background:rgba(128,150,176,.04);opacity:.5">
+          <div style="font-size:18px"></div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--gray);text-decoration:line-through">Gestion manuelle boutique</div>
+            <div style="font-size:10px;color:var(--gray)">Remplacée par QR check-in automatique</div>
+          </div>
+          <span style="background:rgba(128,150,176,.1);border:1px solid rgba(128,150,176,.2);border-radius:5px;padding:2px 8px;font-size:10px;color:var(--gray);white-space:nowrap;margin-left:6px">✕ Automatisé</span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 10 - STACK TECHNIQUE -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">ARCHITECTURE</div>
+      <h1>Stack technique</h1>
+    </div>
+    <div class="two-col" style="align-items:start;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="card">
+          <div class="stack-head">
+            <h3>Back-end</h3>
+            <img class="stack-icon" src="https://cdn.simpleicons.org/php/6EC6F0" alt="PHP">
+          </div>
+          <p><strong>PHP 8.2 natif</strong><br>MVC sur mesure, sans framework</p>
+        </div>
+        <div class="card">
+          <div class="stack-head">
+            <h3>Base de données</h3>
+            <img class="stack-icon" src="https://cdn.simpleicons.org/mysql/6EC6F0" alt="MySQL">
+          </div>
+          <p><strong>MySQL 8.0 InnoDB</strong><br>Transactions ACID (FOR UPDATE)</p>
+        </div>
+        <div class="card">
+          <div class="stack-head">
+            <h3>Front-end</h3>
+            <div class="stack-icons">
+              <img class="stack-icon" src="https://cdn.simpleicons.org/html5/F0A500" alt="HTML5">
+              <img class="stack-icon" src="https://cdn.simpleicons.org/css/6EC6F0" alt="CSS3">
+              <img class="stack-icon" src="https://cdn.simpleicons.org/javascript/F0A500" alt="JavaScript">
+            </div>
+          </div>
+          <p><strong>HTML5, CSS3, JS ES6+</strong><br>Interface responsive</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="card">
+          <div class="stack-head">
+            <h3>Accès données</h3>
+            <span style="font-size:11px;font-weight:800;background:rgba(110,198,240,.15);border:1px solid rgba(110,198,240,.4);border-radius:5px;padding:3px 7px;color:#6EC6F0;flex-shrink:0">PDO</span>
+          </div>
+          <p><strong>PDO requêtes préparées</strong><br>Protection injection SQL</p>
+        </div>
+        <div class="card">
+          <div class="stack-head">
+            <h3>Environnement</h3>
+            <div style="width:26px;height:26px;background:#6dbf6d;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">W</div>
+          </div>
+          <p><strong>WampServer</strong><br>Environnement cohérent</p>
+        </div>
+        <div class="card">
+          <div class="stack-head">
+            <h3>Outillage</h3>
+            <div class="stack-icons">
+              <img class="stack-icon" src="https://cdn.simpleicons.org/git/F0A500" alt="Git">
+              <img class="stack-icon" src="https://cdn.simpleicons.org/figma/6EC6F0" alt="Figma">
+              <span style="font-size:10px;font-weight:800;background:rgba(240,165,0,.15);border:1px solid rgba(240,165,0,.4);border-radius:5px;padding:3px 7px;color:#F0A500;flex-shrink:0">phpMyAdmin</span>
+            </div>
+          </div>
+          <p><strong>Git, Figma, phpMyAdmin</strong><br>Versionnage, maquettes, gestion BDD</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 11 - SCHÉMA ARCHITECTURE MVC NATIF --> 
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">ARCHITECTURE</div>
+      <h1>Schéma architecture MVC natif</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;flex:1">
+
+      <!-- Navigateur -->
+      <div class="arch-box" style="min-width:260px;text-align:center">
+        <div class="layer">Client</div>
+        <div class="comp">Navigateur</div>
+      </div>
+
+      <div style="text-align:center;padding:3px 0;color:var(--gold);font-size:13px;line-height:1.2">↓<br><span style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Requête HTTP</span></div>
+
+      <!-- Routeur -->
+      <div class="arch-box" style="min-width:260px;text-align:center;border-color:rgba(240,165,0,.45)">
+        <div class="layer">Routeur central - Front Controller</div>
+        <div class="comp">public/index.php</div>
+      </div>
+
+      <div style="text-align:center;padding:3px 0;color:var(--gold);font-size:13px;line-height:1.2">↓<br><span style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Instancie</span></div>
+
+      <!-- Contrôleurs -->
+      <div class="arch-box" style="min-width:420px;text-align:center;border-color:rgba(58,143,209,.55)">
+        <div class="layer">Contrôleurs</div>
+        <div class="comp">EventController · UserController · RegistrationController · ManagerController · AdminController</div>
+      </div>
+
+      <!-- Deux branches côte à côte : Modèles+BDD et Vues -->
+      <div style="display:flex;align-items:flex-start;gap:40px;margin-top:0">
+
+        <!-- Branche gauche : Modèles → BDD -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+          <div style="text-align:center;padding:3px 0;color:var(--gold);font-size:13px;line-height:1.2">↓<br><span style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Appelle</span></div>
+          <div class="arch-box" style="min-width:190px;text-align:center">
+            <div class="layer">Modèles (PDO)</div>
+            <div class="comp">Event · User · Registration · Location</div>
+          </div>
+          <div style="text-align:center;padding:3px 0;color:var(--gold);font-size:13px;line-height:1.2">↕<br><span style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Requêtes préparées</span></div>
+          <div class="arch-box" style="min-width:190px;text-align:center;border-color:rgba(39,174,96,.5)">
+            <div class="layer">Base de données</div>
+            <div class="comp">MySQL 8 · InnoDB</div>
+          </div>
+        </div>
+
+        <!-- Branche droite : Vues → Réponse -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+          <div style="text-align:center;padding:3px 0;color:var(--gold);font-size:13px;line-height:1.2">↓<br><span style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Charge</span></div>
+          <div class="arch-box" style="min-width:190px;text-align:center">
+            <div class="layer">Vues</div>
+            <div class="comp">app/views/ (HTML + PHP)</div>
+          </div>
+          <div style="text-align:center;padding:3px 0;color:var(--gold);font-size:13px;line-height:1.2">↓<br><span style="font-size:9px;color:var(--gray);text-transform:uppercase;letter-spacing:.5px">Retourne</span></div>
+          <div class="arch-box" style="min-width:190px;text-align:center;border-color:rgba(240,165,0,.45)">
+            <div class="layer">Réponse</div>
+            <div class="comp">Page HTML rendue</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 12 - RÔLES UTILISATEURS UML -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">ARCHITECTURE</div>
+      <h1>Rôles utilisateurs &amp; cas d'utilisation</h1>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 900 420" width="100%" height="100%" style="max-height:400px;font-family:inherit" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            .uc-text { font-size:11px; fill:#e8eaf0; text-anchor:middle; dominant-baseline:middle; }
+            .actor-label { font-size:12px; fill:#b0bec5; text-anchor:middle; }
+            .section-label { font-size:9px; fill:#607080; text-anchor:middle; letter-spacing:1px; text-transform:uppercase; }
+            .sys-label { font-size:10px; fill:#4a6070; text-anchor:middle; letter-spacing:1.5px; }
+            .conn { stroke:rgba(255,255,255,0.18); stroke-width:1; fill:none; }
+          </style>
+        </defs>
+
+        <!-- System boundary -->
+        <rect x="145" y="18" width="610" height="384" rx="10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+        <text x="450" y="34" class="sys-label">«SYSTÈME» AGENDA LTDJ V2</text>
+
+        <!-- ── LEFT COLUMN USE CASES (x=295) ── -->
+        <!-- Public / Joueur -->
+        <text x="295" y="56" class="section-label">Public &amp; Joueur</text>
+
+        <!-- UC1: Consulter le calendrier -->
+        <ellipse cx="295" cy="85"  rx="110" ry="17" fill="rgba(58,143,209,0.12)" stroke="rgba(58,143,209,0.5)" stroke-width="1.2"/>
+        <text x="295" y="85" class="uc-text">Consulter le calendrier</text>
+
+        <!-- UC2: Voir détail tournoi -->
+        <ellipse cx="295" cy="128" rx="110" ry="17" fill="rgba(58,143,209,0.12)" stroke="rgba(58,143,209,0.5)" stroke-width="1.2"/>
+        <text x="295" y="128" class="uc-text">Voir détail tournoi</text>
+
+        <!-- UC3: Créer un compte -->
+        <ellipse cx="295" cy="171" rx="110" ry="17" fill="rgba(58,143,209,0.08)" stroke="rgba(58,143,209,0.35)" stroke-width="1.2"/>
+        <text x="295" y="171" class="uc-text">Créer un compte</text>
+
+        <!-- UC4: Se connecter -->
+        <ellipse cx="295" cy="214" rx="110" ry="17" fill="rgba(58,143,209,0.12)" stroke="rgba(58,143,209,0.5)" stroke-width="1.2"/>
+        <text x="295" y="214" class="uc-text">Se connecter</text>
+
+        <!-- UC5: S'inscrire à un tournoi -->
+        <ellipse cx="295" cy="270" rx="110" ry="17" fill="rgba(39,174,96,0.12)" stroke="rgba(39,174,96,0.5)" stroke-width="1.2"/>
+        <text x="295" y="270" class="uc-text">S'inscrire à un tournoi</text>
+
+        <!-- UC6: Annuler inscription -->
+        <ellipse cx="295" cy="313" rx="110" ry="17" fill="rgba(39,174,96,0.12)" stroke="rgba(39,174,96,0.5)" stroke-width="1.2"/>
+        <text x="295" y="313" class="uc-text">Annuler inscription</text>
+
+        <!-- UC7: Voir QR codes / Templix -->
+        <ellipse cx="295" cy="356" rx="110" ry="17" fill="rgba(39,174,96,0.12)" stroke="rgba(39,174,96,0.5)" stroke-width="1.2"/>
+        <text x="295" y="356" class="uc-text">Mes QR codes &amp; Templix</text>
+
+        <!-- ── RIGHT COLUMN USE CASES (x=625) ── -->
+        <text x="625" y="56" class="section-label">Manager &amp; Admin</text>
+
+        <!-- UC8: Créer / modifier tournoi -->
+        <ellipse cx="625" cy="90"  rx="115" ry="17" fill="rgba(240,165,0,0.1)" stroke="rgba(240,165,0,0.45)" stroke-width="1.2"/>
+        <text x="625" y="90" class="uc-text">Créer / modifier tournoi</text>
+
+        <!-- UC9: Gérer les inscrits -->
+        <ellipse cx="625" cy="140" rx="115" ry="17" fill="rgba(240,165,0,0.1)" stroke="rgba(240,165,0,0.45)" stroke-width="1.2"/>
+        <text x="625" y="140" class="uc-text">Gérer les inscrits</text>
+
+        <!-- UC10: Check-in QR -->
+        <ellipse cx="625" cy="190" rx="115" ry="17" fill="rgba(240,165,0,0.1)" stroke="rgba(240,165,0,0.45)" stroke-width="1.2"/>
+        <text x="625" y="190" class="uc-text">Check-in QR</text>
+
+        <!-- UC11: Analytics -->
+        <ellipse cx="625" cy="240" rx="115" ry="17" fill="rgba(240,165,0,0.1)" stroke="rgba(240,165,0,0.45)" stroke-width="1.2"/>
+        <text x="625" y="240" class="uc-text">Analytics boutique</text>
+
+        <!-- UC12: Gérer managers -->
+        <ellipse cx="625" cy="305" rx="115" ry="17" fill="rgba(231,76,60,0.1)" stroke="rgba(231,76,60,0.45)" stroke-width="1.2"/>
+        <text x="625" y="305" class="uc-text">Gérer les managers</text>
+
+        <!-- UC13: Gérer boutiques -->
+        <ellipse cx="625" cy="355" rx="115" ry="17" fill="rgba(231,76,60,0.1)" stroke="rgba(231,76,60,0.45)" stroke-width="1.2"/>
+        <text x="625" y="355" class="uc-text">Gérer les boutiques</text>
+
+        <!-- ── ACTOR: Public (left, y=100) ── -->
+        <!-- head -->
+        <circle cx="72" cy="88" r="10" fill="none" stroke="#7f8c8d" stroke-width="1.5"/>
+        <!-- body -->
+        <line x1="72" y1="98" x2="72" y2="122" stroke="#7f8c8d" stroke-width="1.5"/>
+        <!-- arms -->
+        <line x1="55" y1="108" x2="89" y2="108" stroke="#7f8c8d" stroke-width="1.5"/>
+        <!-- legs -->
+        <line x1="72" y1="122" x2="58" y2="140" stroke="#7f8c8d" stroke-width="1.5"/>
+        <line x1="72" y1="122" x2="86" y2="140" stroke="#7f8c8d" stroke-width="1.5"/>
+        <text x="72" y="155" class="actor-label">Public</text>
+
+        <!-- Public → UC1 -->
+        <line x1="83" y1="95" x2="185" y2="85" class="conn"/>
+        <!-- Public → UC2 -->
+        <line x1="83" y1="105" x2="185" y2="128" class="conn"/>
+
+        <!-- ── ACTOR: Joueur (left, y=290) ── -->
+        <circle cx="72" cy="265" r="10" fill="none" stroke="#3a8fd1" stroke-width="1.5"/>
+        <line x1="72" y1="275" x2="72" y2="299" stroke="#3a8fd1" stroke-width="1.5"/>
+        <line x1="55" y1="285" x2="89" y2="285" stroke="#3a8fd1" stroke-width="1.5"/>
+        <line x1="72" y1="299" x2="58" y2="317" stroke="#3a8fd1" stroke-width="1.5"/>
+        <line x1="72" y1="299" x2="86" y2="317" stroke="#3a8fd1" stroke-width="1.5"/>
+        <text x="72" y="332" class="actor-label" fill="#3a8fd1">Joueur</text>
+
+        <!-- Joueur → UC2 -->
+        <line x1="83" y1="268" x2="185" y2="171" class="conn"/>
+        <!-- Joueur → UC4 -->
+        <line x1="83" y1="272" x2="185" y2="214" class="conn"/>
+        <!-- Joueur → UC5 -->
+        <line x1="83" y1="275" x2="185" y2="270" class="conn"/>
+        <!-- Joueur → UC6 -->
+        <line x1="83" y1="278" x2="185" y2="313" class="conn"/>
+        <!-- Joueur → UC7 -->
+        <line x1="83" y1="282" x2="185" y2="356" class="conn"/>
+
+        <!-- ── ACTOR: Manager (right, y=145) ── -->
+        <circle cx="828" cy="130" r="10" fill="none" stroke="#f0a500" stroke-width="1.5"/>
+        <line x1="828" y1="140" x2="828" y2="164" stroke="#f0a500" stroke-width="1.5"/>
+        <line x1="811" y1="150" x2="845" y2="150" stroke="#f0a500" stroke-width="1.5"/>
+        <line x1="828" y1="164" x2="814" y2="182" stroke="#f0a500" stroke-width="1.5"/>
+        <line x1="828" y1="164" x2="842" y2="182" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="828" y="197" class="actor-label" fill="#f0a500">Manager</text>
+
+        <!-- Manager → UC8 -->
+        <line x1="817" y1="133" x2="740" y2="90" class="conn"/>
+        <!-- Manager → UC9 -->
+        <line x1="817" y1="138" x2="740" y2="140" class="conn"/>
+        <!-- Manager → UC10 -->
+        <line x1="817" y1="145" x2="740" y2="190" class="conn"/>
+        <!-- Manager → UC11 -->
+        <line x1="817" y1="152" x2="740" y2="240" class="conn"/>
+
+        <!-- ── ACTOR: Admin (right, y=330) ── -->
+        <circle cx="828" cy="305" r="10" fill="none" stroke="#e74c3c" stroke-width="1.5"/>
+        <line x1="828" y1="315" x2="828" y2="339" stroke="#e74c3c" stroke-width="1.5"/>
+        <line x1="811" y1="325" x2="845" y2="325" stroke="#e74c3c" stroke-width="1.5"/>
+        <line x1="828" y1="339" x2="814" y2="357" stroke="#e74c3c" stroke-width="1.5"/>
+        <line x1="828" y1="339" x2="842" y2="357" stroke="#e74c3c" stroke-width="1.5"/>
+        <text x="828" y="372" class="actor-label" fill="#e74c3c">Admin</text>
+
+        <!-- Admin → UC8 (via Manager inheritance - dashed) -->
+        <line x1="817" y1="308" x2="740" y2="90" stroke="rgba(231,76,60,0.15)" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+        <!-- Admin → UC12 -->
+        <line x1="817" y1="312" x2="740" y2="305" class="conn"/>
+        <!-- Admin → UC13 -->
+        <line x1="817" y1="318" x2="740" y2="355" class="conn"/>
+
+        <!-- note bas -->
+        <text x="450" y="408" style="font-size:9px;fill:#4a6070;text-anchor:middle;font-style:italic">Hiérarchie des rôles : Public ⊂ Joueur ⊂ Manager ⊂ Admin</text>
+
+      </svg>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 13 - ARBORESCENCE DES PAGES -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONCEPTION</div>
+      <h1>Pages et niveaux d'accès</h1>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-content:start;padding-top:6px">
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="text-align:center"><span class="badge badge-gray" style="font-size:10px;padding:3px 10px">Public</span></div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Calendrier</div><div style="font-size:10px;color:var(--gray)">Filtres ville / jeu</div></div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Détail tournoi</div><div style="font-size:10px;color:var(--gray)">Infos, places restantes</div></div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Connexion</div><div style="font-size:10px;color:var(--gray)">Formulaire login</div></div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Inscription</div><div style="font-size:10px;color:var(--gray)">Création de compte joueur</div></div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Mot de passe oublié</div><div style="font-size:10px;color:var(--gray)">Réinitialisation par token</div></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="text-align:center"><span class="badge badge-blue" style="font-size:10px;padding:3px 10px">Joueur</span></div>
+        <div style="background:rgba(58,143,209,.08);border:1px solid rgba(58,143,209,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Mon profil</div><div style="font-size:10px;color:var(--gray)">Infos, solde Templix</div></div>
+        <div style="background:rgba(58,143,209,.08);border:1px solid rgba(58,143,209,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Mes QR codes</div><div style="font-size:10px;color:var(--gray)">Crédits Templix à présenter</div></div>
+        <div style="background:rgba(58,143,209,.08);border:1px solid rgba(58,143,209,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Inscription tournoi</div><div style="font-size:10px;color:var(--gray)">Place ou liste d'attente FIFO</div></div>
+        <div style="background:rgba(58,143,209,.08);border:1px solid rgba(58,143,209,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Annulation</div><div style="font-size:10px;color:var(--gray)">Libère la place suivante</div></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="text-align:center"><span class="badge badge-gold" style="font-size:10px;padding:3px 10px">Manager</span></div>
+        <div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Dashboard</div><div style="font-size:10px;color:var(--gray)">Vue globale boutique</div></div>
+        <div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Créer / modifier tournoi</div><div style="font-size:10px;color:var(--gray)">Formulaire CRUD événement</div></div>
+        <div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Liste inscrits</div><div style="font-size:10px;color:var(--gray)">Confirmés + liste d'attente</div></div>
+        <div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Check-in</div><div style="font-size:10px;color:var(--gray)">Scan QR ou bouton présent</div></div>
+        <div style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Analytics</div><div style="font-size:10px;color:var(--gray)">Stats présence, Templix, top jeux</div></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="text-align:center"><span class="badge badge-red" style="font-size:10px;padding:3px 10px">Admin</span></div>
+        <div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Dashboard admin</div><div style="font-size:10px;color:var(--gray)">Gérer les managers</div></div>
+        <div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Gestion boutiques</div><div style="font-size:10px;color:var(--gray)">10 lieux du réseau</div></div>
+        <div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Dashboard manager</div><div style="font-size:10px;color:var(--gray)">Accès toutes boutiques</div></div>
+        <div style="background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.25);border-radius:7px;padding:8px 10px"><div style="font-size:11px;font-weight:700;color:var(--light);margin-bottom:2px">Analytics</div><div style="font-size:10px;color:var(--gray)">Stats globales réseau</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 14 - MAQUETTES DESKTOP -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONCEPTION</div>
+      <h1>Maquettes Figma - Desktop</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;height:390px;flex:1">
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon"></div>
+      </div>
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon"></div>
+      </div>
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon">⚙️</div>
+      </div>
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon">✍️</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 15 - MAQUETTES MOBILE -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">CONCEPTION</div>
+      <h1>Maquettes Mobile - 375 px</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;height:390px;flex:1">
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon"></div>
+      </div>
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon"></div>
+      </div>
+      <div class="screenshot-zone" style="height:100%">
+        
+        <div class="sz-icon"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 16 - SCHÉMA BDD -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Base de données - Modélisation MLD</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;height:410px">
+
+      <!-- ── Diagramme ER inline SVG ── -->
+      <div style="background:rgba(13,32,64,.6);border:1px solid rgba(58,143,209,.3);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 700 410" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+          <defs>
+            <marker id="arw-b" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+              <polygon points="0 0, 7 3.5, 0 7" fill="#3a8fd1"/>
+            </marker>
+          </defs>
+
+          <!-- ── LIGNES DE RELATION (dessinées en premier) ── -->
+          <g transform="translate(40,0)">
+
+          <!-- 1 · locations ──1──→──N── events (location_id FK) -->
+          <polyline points="165,48 180,48 180,192 195,192" fill="none" stroke="#3a8fd1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arw-b)"/>
+          <text x="167" y="45" fill="#e8f0f8" font-size="9" font-family="monospace">1</text>
+          <text x="182" y="189" fill="#e8f0f8" font-size="9" font-family="monospace">N</text>
+
+          <!-- 2 · users ──1──→──N── events (organizer_id FK) -->
+          <polyline points="410,48 395,48 395,210 370,210" fill="none" stroke="#3a8fd1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arw-b)"/>
+          <text x="399" y="45" fill="#e8f0f8" font-size="9" font-family="monospace">1</text>
+          <text x="372" y="207" fill="#e8f0f8" font-size="9" font-family="monospace">N</text>
+
+          <!-- 3 · events ──1──→──N── registrations (event_id FK) -->
+          <polyline points="282,219 282,260" fill="none" stroke="#3a8fd1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arw-b)"/>
+          <text x="287" y="232" fill="#e8f0f8" font-size="9" font-family="monospace">1</text>
+          <text x="287" y="255" fill="#e8f0f8" font-size="9" font-family="monospace">N</text>
+
+          <!-- 4 · users ──1──→──N── registrations (user_id FK) -->
+          <polyline points="575,48 620,48 620,329 370,329" fill="none" stroke="#3a8fd1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arw-b)"/>
+          <text x="577" y="45" fill="#e8f0f8" font-size="9" font-family="monospace">1</text>
+          <text x="372" y="326" fill="#e8f0f8" font-size="9" font-family="monospace">N</text>
+
+          <!-- ══════════ TABLE : locations ══════════ -->
+          <rect x="15" y="15" width="150" height="132" rx="5" fill="#0d2440" stroke="#3a8fd1" stroke-width="1.5"/>
+          <rect x="15" y="15" width="150" height="24" rx="5" fill="#1e3a5f"/>
+          <rect x="15" y="30" width="150" height="9" fill="#1e3a5f"/>
+          <text x="90" y="31" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold" font-family="'Segoe UI',Arial,sans-serif">locations</text>
+          <line x1="15" y1="39" x2="165" y2="39" stroke="#3a8fd1" stroke-width="0.5"/>
+          <text x="22" y="51" fill="#f0a500" font-size="10" font-family="monospace" font-weight="bold">PK</text>
+          <text x="41" y="51" fill="#e8f0f8" font-size="10" font-family="monospace">id</text>
+          <text x="115" y="51" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="15" y1="57" x2="165" y2="57" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="22" y="69" fill="#e8f0f8" font-size="10" font-family="monospace">name</text>
+          <text x="115" y="69" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="15" y1="75" x2="165" y2="75" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="22" y="87" fill="#e8f0f8" font-size="10" font-family="monospace">city</text>
+          <text x="115" y="87" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="15" y1="93" x2="165" y2="93" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="22" y="105" fill="#e8f0f8" font-size="10" font-family="monospace">address</text>
+          <text x="115" y="105" fill="#8096b0" font-size="9" font-family="monospace">TEXT</text>
+          <line x1="15" y1="111" x2="165" y2="111" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="22" y="123" fill="#e8f0f8" font-size="10" font-family="monospace">is_store</text>
+          <text x="115" y="123" fill="#8096b0" font-size="9" font-family="monospace">BOOL</text>
+          <line x1="15" y1="129" x2="165" y2="129" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="22" y="141" fill="#e8f0f8" font-size="10" font-family="monospace">phone</text>
+          <text x="115" y="141" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+
+          <!-- ══════════ TABLE : events ══════════ -->
+          <rect x="195" y="15" width="175" height="204" rx="5" fill="#0d2440" stroke="#3a8fd1" stroke-width="1.5"/>
+          <rect x="195" y="15" width="175" height="24" rx="5" fill="#1e3a5f"/>
+          <rect x="195" y="30" width="175" height="9" fill="#1e3a5f"/>
+          <text x="282" y="31" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold" font-family="'Segoe UI',Arial,sans-serif">events</text>
+          <line x1="195" y1="39" x2="370" y2="39" stroke="#3a8fd1" stroke-width="0.5"/>
+          <text x="202" y="51" fill="#f0a500" font-size="10" font-family="monospace" font-weight="bold">PK</text>
+          <text x="221" y="51" fill="#e8f0f8" font-size="10" font-family="monospace">id</text>
+          <text x="320" y="51" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="57" x2="370" y2="57" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="69" fill="#e8f0f8" font-size="10" font-family="monospace">title</text>
+          <text x="320" y="69" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="195" y1="75" x2="370" y2="75" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="87" fill="#e8f0f8" font-size="10" font-family="monospace">start_date</text>
+          <text x="320" y="87" fill="#8096b0" font-size="9" font-family="monospace">DATETIME</text>
+          <line x1="195" y1="93" x2="370" y2="93" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="105" fill="#e8f0f8" font-size="10" font-family="monospace">end_date</text>
+          <text x="320" y="105" fill="#8096b0" font-size="9" font-family="monospace">DATETIME</text>
+          <line x1="195" y1="111" x2="370" y2="111" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="123" fill="#e8f0f8" font-size="10" font-family="monospace">price</text>
+          <text x="320" y="123" fill="#8096b0" font-size="9" font-family="monospace">DECIMAL</text>
+          <line x1="195" y1="129" x2="370" y2="129" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="141" fill="#e8f0f8" font-size="10" font-family="monospace">quota_max</text>
+          <text x="320" y="141" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="147" x2="370" y2="147" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="159" fill="#e8f0f8" font-size="10" font-family="monospace">game_type</text>
+          <text x="320" y="159" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="195" y1="165" x2="370" y2="165" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="177" fill="#e8f0f8" font-size="10" font-family="monospace">templix_reward</text>
+          <text x="320" y="177" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="183" x2="370" y2="183" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="195" fill="#3a8fd1" font-size="10" font-family="monospace" font-weight="bold">FK</text>
+          <text x="221" y="195" fill="#3a8fd1" font-size="10" font-family="monospace">location_id</text>
+          <text x="320" y="195" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="201" x2="370" y2="201" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="213" fill="#3a8fd1" font-size="10" font-family="monospace" font-weight="bold">FK</text>
+          <text x="221" y="213" fill="#3a8fd1" font-size="10" font-family="monospace">organizer_id</text>
+          <text x="320" y="213" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+
+          <!-- ══════════ TABLE : users ══════════ -->
+          <rect x="410" y="15" width="165" height="132" rx="5" fill="#0d2440" stroke="#3a8fd1" stroke-width="1.5"/>
+          <rect x="410" y="15" width="165" height="24" rx="5" fill="#1e3a5f"/>
+          <rect x="410" y="30" width="165" height="9" fill="#1e3a5f"/>
+          <text x="492" y="31" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold" font-family="'Segoe UI',Arial,sans-serif">users</text>
+          <line x1="410" y1="39" x2="575" y2="39" stroke="#3a8fd1" stroke-width="0.5"/>
+          <text x="417" y="51" fill="#f0a500" font-size="10" font-family="monospace" font-weight="bold">PK</text>
+          <text x="436" y="51" fill="#e8f0f8" font-size="10" font-family="monospace">id</text>
+          <text x="530" y="51" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="410" y1="57" x2="575" y2="57" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="417" y="69" fill="#e8f0f8" font-size="10" font-family="monospace">email</text>
+          <text x="530" y="69" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="410" y1="75" x2="575" y2="75" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="417" y="87" fill="#e8f0f8" font-size="10" font-family="monospace">password</text>
+          <text x="530" y="87" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="410" y1="93" x2="575" y2="93" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="417" y="105" fill="#e8f0f8" font-size="10" font-family="monospace">role</text>
+          <text x="530" y="105" fill="#8096b0" font-size="9" font-family="monospace">ENUM</text>
+          <line x1="410" y1="111" x2="575" y2="111" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="417" y="123" fill="#e8f0f8" font-size="10" font-family="monospace">templix_balance</text>
+          <text x="530" y="123" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="410" y1="129" x2="575" y2="129" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="417" y="141" fill="#3a8fd1" font-size="9" font-family="monospace" font-weight="bold">FK</text>
+          <text x="436" y="141" fill="#3a8fd1" font-size="9" font-family="monospace">home_location_id</text>
+          <text x="530" y="141" fill="#8096b0" font-size="8" font-family="monospace">INT</text>
+
+          <!-- ══════════ TABLE : registrations ══════════ -->
+          <rect x="195" y="260" width="175" height="132" rx="5" fill="#0d2440" stroke="#3a8fd1" stroke-width="1.5"/>
+          <rect x="195" y="260" width="175" height="24" rx="5" fill="#1e3a5f"/>
+          <rect x="195" y="275" width="175" height="9" fill="#1e3a5f"/>
+          <text x="282" y="276" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="bold" font-family="'Segoe UI',Arial,sans-serif">registrations</text>
+          <line x1="195" y1="284" x2="370" y2="284" stroke="#3a8fd1" stroke-width="0.5"/>
+          <text x="202" y="296" fill="#f0a500" font-size="10" font-family="monospace" font-weight="bold">PK</text>
+          <text x="221" y="296" fill="#e8f0f8" font-size="10" font-family="monospace">id</text>
+          <text x="320" y="296" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="302" x2="370" y2="302" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="314" fill="#3a8fd1" font-size="10" font-family="monospace" font-weight="bold">FK</text>
+          <text x="221" y="314" fill="#3a8fd1" font-size="10" font-family="monospace">event_id</text>
+          <text x="320" y="314" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="320" x2="370" y2="320" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="332" fill="#3a8fd1" font-size="10" font-family="monospace" font-weight="bold">FK</text>
+          <text x="221" y="332" fill="#3a8fd1" font-size="10" font-family="monospace">user_id</text>
+          <text x="320" y="332" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="195" y1="338" x2="370" y2="338" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="350" fill="#e8f0f8" font-size="10" font-family="monospace">status</text>
+          <text x="320" y="350" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="195" y1="356" x2="370" y2="356" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="368" fill="#e8f0f8" font-size="10" font-family="monospace">checked_in</text>
+          <text x="320" y="368" fill="#8096b0" font-size="9" font-family="monospace">TINYINT</text>
+          <line x1="195" y1="374" x2="370" y2="374" stroke="rgba(58,143,209,.2)" stroke-width="0.5"/>
+          <text x="202" y="386" fill="#e8f0f8" font-size="10" font-family="monospace">paid</text>
+          <text x="320" y="386" fill="#8096b0" font-size="9" font-family="monospace">TINYINT</text>
+
+          <!-- ══════════ TABLE : game_types ══════════ -->
+          <rect x="20" y="210" width="140" height="102" rx="5" fill="#0d2440" stroke="#f0a500" stroke-width="1.2" stroke-dasharray="4,2"/>
+          <rect x="20" y="210" width="140" height="22" rx="5" fill="#1e3a5f"/>
+          <rect x="20" y="223" width="140" height="9" fill="#1e3a5f"/>
+          <text x="90" y="225" text-anchor="middle" fill="#f0a500" font-size="11" font-weight="bold" font-family="'Segoe UI',Arial,sans-serif">game_types</text>
+          <line x1="20" y1="232" x2="160" y2="232" stroke="#f0a500" stroke-width="0.5"/>
+          <text x="27" y="244" fill="#f0a500" font-size="10" font-family="monospace" font-weight="bold">PK</text>
+          <text x="46" y="244" fill="#e8f0f8" font-size="10" font-family="monospace">id</text>
+          <text x="115" y="244" fill="#8096b0" font-size="9" font-family="monospace">INT</text>
+          <line x1="20" y1="250" x2="160" y2="250" stroke="rgba(240,165,0,.2)" stroke-width="0.5"/>
+          <text x="27" y="262" fill="#e8f0f8" font-size="10" font-family="monospace">name</text>
+          <text x="115" y="262" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="20" y1="268" x2="160" y2="268" stroke="rgba(240,165,0,.2)" stroke-width="0.5"/>
+          <text x="27" y="280" fill="#e8f0f8" font-size="10" font-family="monospace">color</text>
+          <text x="115" y="280" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+          <line x1="20" y1="286" x2="160" y2="286" stroke="rgba(240,165,0,.2)" stroke-width="0.5"/>
+          <text x="27" y="298" fill="#e8f0f8" font-size="10" font-family="monospace">short_name</text>
+          <text x="115" y="298" fill="#8096b0" font-size="9" font-family="monospace">VARCHAR</text>
+
+          <!-- Relation game_types.name ~ events.game_type (pointillés oranges = référence logique) -->
+          <line x1="160" y1="252" x2="195" y2="162" stroke="#f0a500" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="163" y="210" fill="#f0a500" font-size="8" font-family="monospace">ref</text>
+
+          </g><!-- /translate -->
+
+          <!-- ══════════ LÉGENDE ══════════ -->
+          <rect x="52" y="394" width="595" height="18" rx="3" fill="rgba(30,58,95,.5)"/>
+          <text x="62" y="406" fill="#f0a500" font-size="9" font-family="monospace" font-weight="bold">PK</text>
+          <text x="76" y="406" fill="#8096b0" font-size="9" font-family="monospace"> Clé primaire</text>
+          <text x="162" y="406" fill="#3a8fd1" font-size="9" font-family="monospace" font-weight="bold">FK</text>
+          <text x="176" y="406" fill="#8096b0" font-size="9" font-family="monospace"> Clé étrangère</text>
+          <line x1="264" y1="403" x2="290" y2="403" stroke="#3a8fd1" stroke-width="1.5" stroke-dasharray="4,2"/>
+          <polygon points="290,400 297,403 290,406" fill="#3a8fd1"/>
+          <text x="301" y="406" fill="#8096b0" font-size="9" font-family="monospace"> Relation 1:N</text>
+        </svg>
+      </div>
+
+      <!-- ── Cartes info ── -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="card">
+          <h3>5 tables (MLD simplifie)</h3>
+          <p style="font-size:11px">users · events · locations<br>registrations · game_types<br><span style="color:#9fb4c8">+ champs secondaires en script</span></p>
+        </div>
+        <div class="card">
+          <h3>Lieu unique</h3>
+          <p style="font-size:11px"><code style="color:var(--accent)">locations.is_store</code> BOOL - boutique LTDJ ou partenaire - 1 seul JOIN</p>
+        </div>
+        <div class="card">
+          <h3>Relations et statuts</h3>
+          <p style="font-size:11px">
+            events → locations (location_id)<br>
+            events → users (organizer_id)<br>
+            registrations → events + users<br>
+            registrations.status + paid + checkin
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 17 - FEATURE 1 CONTROLLER (CALENDRIER) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Fonctionnalité 1 : Affichage du calendrier</h1>
+      <div class="label" style="margin-top:6px">Controller - EventController.php → index()</div>
+    </div>
+    <div class="two-col">
+<pre style="font-size:9px;line-height:1.5;max-height:420px;overflow:auto">
+<span class="kw">public function</span> <span class="fn">index</span>() {
+  <span class="kw">$eventModel</span> = <span class="kw">new</span> <span class="fn">Event</span>(<span class="kw">$this</span>-&gt;db);
+
+  <span class="cmt">// Navigation mensuelle : on lit ?year= et ?month= (défaut = mois courant)</span>
+  <span class="kw">$year</span>  = (<span class="kw">int</span>)(<span class="kw">$_GET</span>[<span class="str">'year'</span>]  ?? <span class="fn">date</span>(<span class="str">'Y'</span>));
+  <span class="kw">$month</span> = (<span class="kw">int</span>)(<span class="kw">$_GET</span>[<span class="str">'month'</span>] ?? <span class="fn">date</span>(<span class="str">'n'</span>));
+
+  <span class="cmt">// Correction si la navigation dépasse les bornes 1-12</span>
+  <span class="kw">if</span> (<span class="kw">$month</span> &lt; <span class="num">1</span>)  { <span class="kw">$month</span> = <span class="num">12</span>; <span class="kw">$year</span>--; }
+  <span class="kw">if</span> (<span class="kw">$month</span> &gt; <span class="num">12</span>) { <span class="kw">$month</span> = <span class="num">1</span>;  <span class="kw">$year</span>++; }
+
+  <span class="cmt">// Filtres optionnels transmis via GET (formulaire &lt;select&gt;)</span>
+  <span class="kw">$city</span>     = <span class="fn">trim</span>(<span class="kw">$_GET</span>[<span class="str">'city'</span>]      ?? <span class="str">''</span>);
+  <span class="kw">$gameType</span> = <span class="fn">trim</span>(<span class="kw">$_GET</span>[<span class="str">'game_type'</span>] ?? <span class="str">''</span>);
+
+  <span class="cmt">// Événements du mois, indexés par jour pour le rendu de la grille</span>
+  <span class="kw">$monthEvents</span> = <span class="kw">$eventModel</span>-&gt;<span class="fn">getEventsByMonth</span>(
+      <span class="kw">$year</span>, <span class="kw">$month</span>, <span class="kw">$city</span>, <span class="kw">$gameType</span>
+  );
+  <span class="kw">$eventsByDay</span> = [];
+  <span class="kw">foreach</span> (<span class="kw">$monthEvents</span> <span class="kw">as</span> <span class="kw">$event</span>) {
+      <span class="kw">$day</span> = (<span class="kw">int</span>) <span class="fn">date</span>(<span class="str">'j'</span>,
+          <span class="fn">strtotime</span>(<span class="kw">$event</span>[<span class="str">'start_date'</span>]));
+      <span class="kw">$eventsByDay</span>[<span class="kw">$day</span>][] = <span class="kw">$event</span>;
+  }
+
+  <span class="cmt">// Données pour les &lt;select&gt; de filtres</span>
+  <span class="kw">$cities</span>    = <span class="kw">$eventModel</span>-&gt;<span class="fn">getCities</span>();
+  <span class="kw">$gameTypes</span> = <span class="kw">$eventModel</span>-&gt;<span class="fn">getGameTypes</span>();
+
+  <span class="fn">require_once</span> <span class="str">'../app/views/events/index.php'</span>;
+}
+</pre>
+      <div>
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">EventController.php</div>
+          <div class="sz-hint">Cliquer pour charger une capture écran</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 18 - FEATURE 1 MODEL (CALENDRIER) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Fonctionnalité 1 : Affichage du calendrier</h1>
+      <div class="label" style="margin-top:6px">Model - Event.php → getEventsByMonth()</div>
+    </div>
+    <div class="two-col">
+<pre style="font-size:8.5px;line-height:1.45;max-height:420px;overflow:auto">
+<span class="cmt">// Model Event.php - getEventsByMonth($year, $month, $city, $game_type)</span>
+
+<span class="kw">$start</span> = <span class="fn">sprintf</span>(<span class="str">'%04d-%02d-01 00:00:00'</span>, <span class="kw">$year</span>, <span class="kw">$month</span>);
+<span class="kw">$end</span>   = <span class="fn">date</span>(<span class="str">'Y-m-t 23:59:59'</span>, <span class="fn">mktime</span>(<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>, <span class="kw">$month</span>,<span class="num">1</span>,<span class="kw">$year</span>));
+
+<span class="kw">$conditions</span> = [<span class="str">'e.start_date BETWEEN :start AND :end'</span>];
+<span class="kw">$params</span>     = [<span class="str">':start'</span> =&gt; <span class="kw">$start</span>, <span class="str">':end'</span> =&gt; <span class="kw">$end</span>];
+
+<span class="kw">if</span> (<span class="kw">$city</span> !== <span class="str">''</span>) {
+    <span class="kw">$conditions</span>[] = <span class="str">'l.city = :city'</span>;
+    <span class="kw">$params</span>[<span class="str">':city'</span>] = <span class="kw">$city</span>;
+}
+<span class="kw">if</span> (<span class="kw">$game_type</span> !== <span class="str">''</span>) {
+    <span class="kw">$conditions</span>[] = <span class="str">'e.game_type = :game_type'</span>;
+    <span class="kw">$params</span>[<span class="str">':game_type'</span>] = <span class="kw">$game_type</span>;
+}
+
+<span class="kw">$where</span> = <span class="str">'WHERE '</span> . <span class="fn">implode</span>(<span class="str">' AND '</span>, <span class="kw">$conditions</span>);
+
+<span class="kw">$stmt</span> = <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">prepare</span>(<span class="str">"
+    SELECT e.*, l.name AS location_name,
+           l.city, l.address, l.maps_url, l.is_store,
+           (SELECT COUNT(*) FROM registrations r
+            WHERE r.event_id = e.id
+              AND r.status = 'validated') AS confirmed_count
+    FROM events e
+    JOIN locations l ON e.location_id = l.id
+    $where
+    ORDER BY e.start_date ASC
+"</span>);
+<span class="kw">$stmt</span>-&gt;<span class="fn">execute</span>(<span class="kw">$params</span>);
+<span class="kw">return</span> <span class="kw">$stmt</span>-&gt;<span class="fn">fetchAll</span>(PDO::FETCH_ASSOC);
+</pre>
+      <div>
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">Model Event.php</div>
+          <div class="sz-hint">Cliquer pour charger une capture écran</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 19 - FEATURE 1 VIEW (CALENDRIER) -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Fonctionnalité 1 : Affichage du calendrier</h1>
+      <div class="label" style="margin-top:6px">View - events/index.php → PHP + JavaScript</div>
+    </div>
+    <div class="two-col">
+<pre style="font-size:9px;line-height:1.45;max-height:420px;overflow:auto">
+<span class="cmt">// 1) Données reçues du Controller : $dayEvents (issues du Model)</span>
+<span class="cmt">// Vue PHP : sérialise les données dans chaque &lt;td&gt;</span>
+<span class="kw">$evtData</span> = <span class="fn">array_map</span>(<span class="kw">fn</span>(<span class="kw">$event</span>) =&gt; [
+  <span class="cmt">// $event = un seul événement du jour</span>
+  <span class="str">'id'</span> =&gt; (<span class="kw">int</span>)<span class="kw">$event</span>[<span class="str">'id'</span>], <span class="str">'title'</span> =&gt; <span class="kw">$event</span>[<span class="str">'title'</span>],
+  <span class="str">'city'</span> =&gt; <span class="kw">$event</span>[<span class="str">'city'</span>],
+  <span class="str">'start_date'</span> =&gt; <span class="kw">$event</span>[<span class="str">'start_date'</span>],
+  <span class="str">'end_date'</span> =&gt; <span class="kw">$event</span>[<span class="str">'end_date'</span>],
+  <span class="str">'quota_max'</span> =&gt; (<span class="kw">int</span>)<span class="kw">$event</span>[<span class="str">'quota_max'</span>],
+  <span class="str">'confirmed_count'</span> =&gt; (<span class="kw">int</span>)<span class="kw">$event</span>[<span class="str">'confirmed_count'</span>]
+], <span class="kw">$dayEvents</span>);
+
+<span class="cmt">// On stocke ce JSON dans data-events (lu ensuite par JS)</span>
+&lt;td <span class="kw">data-events</span>=<span class="str">"&lt;?= htmlspecialchars(
+       json_encode($evtData), ENT_QUOTES) ?&gt;"</span>&gt;
+
+<span class="cmt">// 2) JS : lit les données et construit les cartes</span>
+<span class="cmt">// events = liste des événements du jour cliqué</span>
+<span class="kw">const</span> events = JSON.<span class="fn">parse</span>(td.dataset.events || <span class="str">'[]'</span>);
+
+<span class="cmt">// event = un événement courant dans la boucle map()</span>
+<span class="kw">function</span> <span class="fn">renderCard</span>(event) {
+  <span class="kw">const</span> isFull = event.confirmed_count &gt;= event.quota_max;
+  <span class="kw">const</span> spots  = event.quota_max - event.confirmed_count;
+  <span class="kw">const</span> spotsText = isFull
+    ? <span class="str">'Complet - liste d\'attente'</span>
+    : spots + <span class="str">' place(s) restante(s)'</span>;
+
+  <span class="kw">return</span> <span class="str">'&lt;div class="day-card"&gt;'</span>
+    + <span class="str">'&lt;strong&gt;'</span> + event.city + <span class="str">' - '</span> + event.title + <span class="str">'&lt;/strong&gt;'</span>
+    + <span class="str">'&lt;div&gt;'</span> + spotsText + <span class="str">'&lt;/div&gt;'</span>
+    + <span class="str">'&lt;a href="…?action=show&amp;id='</span> + event.id + <span class="str">'"&gt;Voir&lt;/a&gt;'</span>
+    + <span class="str">'&lt;/div&gt;'</span>;
+}
+
+<span class="cmt">// 3) Injection dans le DOM</span>
+panel.innerHTML = events.<span class="fn">map</span>(renderCard).<span class="fn">join</span>(<span class="str">''</span>);
+
+<span class="cmt">// 4) Hover + clic sur une case (desktop + mobile)</span>
+<span class="kw">function</span> <span class="fn">tryOpenDay</span>(td) {
+  <span class="kw">const</span> evs = JSON.<span class="fn">parse</span>(td.dataset.events || <span class="str">'[]'</span>);
+  <span class="kw">if</span> (!evs.length) <span class="kw">return</span>;
+  <span class="fn">openDayDetail</span>(<span class="fn">parseInt</span>(td.<span class="fn">querySelector</span>(<span class="str">'.cal-day-num'</span>).textContent, <span class="num">10</span>));
+}
+
+calTable.<span class="fn">querySelectorAll</span>(<span class="str">'td:not(.empty)'</span>).<span class="fn">forEach</span>(td =&gt; {
+  td.<span class="fn">addEventListener</span>(<span class="str">'mouseenter'</span>, () =&gt; <span class="fn">tryOpenDay</span>(td));
+  td.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, e =&gt; {
+    <span class="kw">if</span> (!e.target.<span class="fn">closest</span>(<span class="str">'.cal-event'</span>)) <span class="fn">tryOpenDay</span>(td);
+  });
+});
+</pre>
+      <div>
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">Vue calendrier + panel jour</div>
+          <div class="sz-hint">Cliquer pour charger une capture écran</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 20 - Fonctionnalité 2 CONTROLLER -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Fonctionnalité 2 : Émargement</h1>
+      <div class="label" style="margin-top:6px">Controller - ManagerController.php (checkin avec validation paiement)</div>
+    </div>
+    <div class="two-col">
+      <pre style="font-size:8.4px;line-height:1.45">
+<span class="cmt">// public/index.php - routeur</span>
+<span class="kw">if</span> (<span class="kw">$action</span> === <span class="str">'manager-checkin'</span>) { <span class="kw">$managerController</span>-&gt;<span class="fn">checkin</span>(); }
+
+<span class="cmt">// Marque un joueur présent et crédite ses Templix (POST uniquement).</span>
+<span class="cmt">// Le manager coche les présents depuis la page événement le jour J.</span>
+<span class="kw">public function</span> <span class="fn">checkin</span>() {
+  <span class="kw">$this</span>-&gt;<span class="fn">requireManager</span>();
+  <span class="fn">csrfValidate</span>(BASE_URL . <span class="str">'?action=manager'</span>);
+
+  <span class="kw">$registration_id</span> = (<span class="kw">int</span>)(<span class="kw">$_POST</span>[<span class="str">'registration_id'</span>] ?? <span class="num">0</span>);
+  <span class="kw">$event_id</span>        = (<span class="kw">int</span>)(<span class="kw">$_POST</span>[<span class="str">'event_id'</span>] ?? <span class="num">0</span>);
+
+  <span class="kw">if</span> (<span class="kw">$registration_id</span> &lt;= <span class="num">0</span> || <span class="kw">$event_id</span> &lt;= <span class="num">0</span>) {
+    <span class="fn">header</span>(<span class="str">'Location: '</span> . BASE_URL . <span class="str">'?action=manager'</span>);
+    <span class="kw">exit</span>;
+  }
+
+  <span class="kw">$eventModel</span>        = <span class="kw">new</span> <span class="fn">Event</span>(<span class="kw">$this</span>-&gt;db);
+  <span class="kw">$registrationModel</span> = <span class="kw">new</span> <span class="fn">Registration</span>(<span class="kw">$this</span>-&gt;db);
+
+  <span class="kw">$event</span>        = <span class="kw">$eventModel</span>-&gt;<span class="fn">getEventById</span>(<span class="kw">$event_id</span>);
+  <span class="kw">$registration</span> = <span class="kw">$registrationModel</span>-&gt;<span class="fn">getUserRegistrationById</span>(<span class="kw">$registration_id</span>);
+
+  <span class="cmt">// Validation : paiement requis si l'événement est payant</span>
+  <span class="kw">if</span> ((<span class="kw">float</span>)<span class="kw">$event</span>[<span class="str">'price'</span>] &gt; <span class="num">0</span> &amp;&amp; <span class="kw">$registration</span>[<span class="str">'paid'</span>] != <span class="num">1</span>) {
+    <span class="fn">header</span>(<span class="str">"Location: "</span> . BASE_URL . <span class="str">"?action=manager-event&amp;id={$event_id}&amp;msg=error-unpaid"</span>);
+    <span class="kw">exit</span>;
+  }
+
+  <span class="kw">$templix_reward</span> = (<span class="kw">int</span>)(<span class="kw">$event</span>[<span class="str">'templix_reward'</span>] ?? <span class="num">0</span>);
+
+  <span class="cmt">// On a besoin de l'user_id pour créditer les Templix - on le lit depuis registrations.</span>
+  <span class="kw">if</span> (<span class="kw">$registration</span>) {
+    <span class="kw">$registrationModel</span>-&gt;<span class="fn">checkin</span>(<span class="kw">$registration_id</span>, <span class="kw">$registration</span>[<span class="str">'user_id'</span>], <span class="kw">$templix_reward</span>);
+  }
+
+  <span class="cmt">// Redirige vers le scanner si émargement via QR, sinon vers la page de l'événement</span>
+  <span class="kw">$redirect</span> = <span class="kw">$_POST</span>[<span class="str">'redirect'</span>] ?? <span class="str">''</span>;
+  <span class="kw">if</span> (<span class="kw">$redirect</span> === <span class="str">'scan'</span>) {
+    <span class="fn">header</span>(<span class="str">'Location: '</span> . BASE_URL . <span class="str">'?action=manager-scan&amp;msg=checked-in'</span>);
+  } <span class="kw">else</span> {
+    <span class="fn">header</span>(<span class="str">"Location: "</span> . BASE_URL . <span class="str">"?action=manager-event&amp;id={$event_id}&amp;msg=checked-in"</span>);
+  }
+  <span class="kw">exit</span>;
+}
+      </pre>
+      <div>
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">Capture Feature 2 - Controller</div>
+          <div class="sz-hint">Cliquer pour charger une capture ecran</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 21 - Fonctionnalité 2 MODEL -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Fonctionnalité 2 : Émargement</h1>
+      <div class="label" style="margin-top:6px">Model - Registration.php (transaction atomique MySQL via PDO)</div>
+    </div>
+    <div class="two-col">
+      <pre style="font-size:8.8px;line-height:1.45">
+<span class="kw">public function</span> <span class="fn">checkin</span>(<span class="kw">$registration_id</span>, <span class="kw">$user_id</span>, <span class="kw">$templix_reward</span> = <span class="num">0</span>) {
+  <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">beginTransaction</span>();
+  <span class="kw">try</span> {
+    <span class="cmt">// On marque présent uniquement si pas déjà fait (checked_in IS NULL → pas encore traité)</span>
+    <span class="kw">$stmt</span> = <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">prepare</span>(<span class="str">"UPDATE registrations SET checked_in = 1
+        WHERE id = :id AND checked_in IS NULL"</span>);
+    <span class="kw">$stmt</span>-&gt;<span class="fn">execute</span>([<span class="str">':id'</span> =&gt; <span class="kw">$registration_id</span>]);
+
+    <span class="cmt">// rowCount() = 0 : déjà émargé - on ne crédite pas deux fois.</span>
+    <span class="kw">if</span> (<span class="kw">$stmt</span>-&gt;<span class="fn">rowCount</span>() === <span class="num">0</span>) {
+      <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">rollBack</span>();
+      <span class="kw">return false</span>;
+    }
+
+    <span class="cmt">// Crédit Templix dans la même transaction - atomique avec le marquage.</span>
+    <span class="kw">if</span> (<span class="kw">$templix_reward</span> &gt; <span class="num">0</span>) {
+      <span class="kw">$stmt</span> = <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">prepare</span>(<span class="str">"UPDATE users
+          SET templix_balance = templix_balance + :amount WHERE id = :id"</span>);
+      <span class="kw">$stmt</span>-&gt;<span class="fn">execute</span>([<span class="str">':amount'</span> =&gt; <span class="kw">$templix_reward</span>, <span class="str">':id'</span> =&gt; <span class="kw">$user_id</span>]);
+    }
+
+    <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">commit</span>();
+    <span class="kw">return true</span>;
+
+  } <span class="kw">catch</span> (Exception <span class="kw">$e</span>) {
+    <span class="kw">$this</span>-&gt;db-&gt;<span class="fn">rollBack</span>();
+    <span class="kw">throw</span> <span class="kw">$e</span>;
+  }
+}
+      </pre>
+      <div>
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">Capture Feature 2 - Model</div>
+          <div class="sz-hint">Cliquer pour charger une capture ecran</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 22 - Fonctionnalité 2 VIEW -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Fonctionnalité 2 : Émargement</h1>
+      <div class="label" style="margin-top:6px">View - manager/event_detail.php + manager/scan.php</div>
+    </div>
+    <div class="two-col">
+      <pre style="font-size:8.6px;line-height:1.45">
+<span class="cmt">// manager/event_detail.php - bouton présence (si payé)</span>
+&lt;?php <span class="kw">if</span> (<span class="kw">$isPaid</span> &amp;&amp; <span class="kw">$reg</span>[<span class="str">'paid'</span>] != <span class="num">1</span>): ?&gt;
+  &lt;button <span class="kw">type</span>=<span class="str">"button"</span> <span class="kw">class</span>=<span class="str">"btn btn-sm"</span> <span class="kw">disabled</span>&gt;✔ Marquer présent&lt;/button&gt;
+&lt;?php <span class="kw">else</span>: ?&gt;
+  &lt;form <span class="kw">method</span>=<span class="str">"POST"</span> <span class="kw">action</span>=<span class="str">"/agenda-ltdj/public/index.php?action=manager-checkin"</span> <span class="kw">class</span>=<span class="str">"d-inline"</span>&gt;
+    &lt;?= <span class="fn">csrfField</span>() ?&gt;
+    &lt;input <span class="kw">type</span>=<span class="str">"hidden"</span> <span class="kw">name</span>=<span class="str">"registration_id"</span> <span class="kw">value</span>=<span class="str">"&lt;?= (int)$reg['id'] ?&gt;"</span>&gt;
+    &lt;input <span class="kw">type</span>=<span class="str">"hidden"</span> <span class="kw">name</span>=<span class="str">"event_id"</span> <span class="kw">value</span>=<span class="str">"&lt;?= (int)$event['id'] ?&gt;"</span>&gt;
+    &lt;button <span class="kw">type</span>=<span class="str">"submit"</span> <span class="kw">class</span>=<span class="str">"btn btn-sm"</span>&gt;✔ Marquer présent&lt;/button&gt;
+  &lt;/form&gt;
+&lt;?php <span class="kw">endif</span>; ?&gt;
+
+<span class="cmt">// manager/scan.php - même endpoint + mêmes IDs + redirect scan</span>
+&lt;form <span class="kw">id</span>=<span class="str">"checkin-form"</span> <span class="kw">method</span>=<span class="str">"POST"</span> <span class="kw">action</span>=<span class="str">"/agenda-ltdj/public/index.php?action=manager-checkin"</span>&gt;
+  &lt;?= <span class="fn">csrfField</span>() ?&gt;
+  &lt;input <span class="kw">type</span>=<span class="str">"hidden"</span> <span class="kw">name</span>=<span class="str">"registration_id"</span> <span class="kw">id</span>=<span class="str">"f-reg-id"</span>&gt;
+  &lt;input <span class="kw">type</span>=<span class="str">"hidden"</span> <span class="kw">name</span>=<span class="str">"event_id"</span> <span class="kw">id</span>=<span class="str">"f-event-id"</span>&gt;
+  &lt;input <span class="kw">type</span>=<span class="str">"hidden"</span> <span class="kw">name</span>=<span class="str">"redirect"</span> <span class="kw">value</span>=<span class="str">"scan"</span>&gt;
+&lt;/form&gt;
+      </pre>
+      <div>
+        <div class="screenshot-zone" style="height:100%">
+          
+          <div class="sz-icon"></div>
+          <div class="sz-label">Capture Feature 2 - View</div>
+          <div class="sz-hint">Cliquer pour charger une capture ecran</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 23 - SÉCURITÉ -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">DÉVELOPPEMENT</div>
+      <h1>Sécurité</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;flex:1">
+
+      <div class="card" style="margin:0;padding:12px 16px">
+        <h3>Ce qu'on a vu dans le code</h3>
+        <ul style="font-size:12px;padding-left:18px;margin:6px 0 0;line-height:1.7">
+          <li><strong>CSRF</strong> - <code style="color:var(--accent)">csrfField()</code> dans le formulaire + <code style="color:var(--accent)">hash_equals()</code> côté Controller</li>
+          <li><strong>Contrôle d'accès</strong> - <code style="color:var(--accent)">requireManager()</code> vérifie la session avant chaque action</li>
+          <li><strong>Transaction atomique</strong> - émargement + crédit Templix dans un <code style="color:var(--accent)">beginTransaction / commit</code></li>
+          <li><strong>Idempotence</strong> - <code style="color:var(--accent)">WHERE checked_in IS NULL</code> empêche le double-checkin</li>
+          <li><strong>XSS</strong> - <code style="color:var(--accent)">htmlspecialchars()</code> sur toutes les sorties dans la vue</li>
+          <li><strong>Casting</strong> - <code style="color:var(--accent)">(int)</code> sur les IDs POST pour éviter l'injection</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin:0;padding:12px 16px">
+        <h3>Ailleurs dans le projet</h3>
+        <ul style="font-size:12px;padding-left:18px;margin:6px 0 0;line-height:1.7">
+          <li><strong>Mots de passe</strong> - <code style="color:var(--accent)">password_hash(BCRYPT)</code> + <code style="color:var(--accent)">password_verify()</code></li>
+          <li><strong>Sessions</strong> - <code style="color:var(--accent)">session_regenerate_id(true)</code> après login pour éviter le fixation</li>
+          <li><strong>SQL</strong> - 100 % requêtes préparées PDO, zéro concaténation</li>
+          <li><strong>Reset password</strong> - token <code style="color:var(--accent)">random_bytes(32)</code>, expiration 1 h, usage unique</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 24- APPLICATION RÉELLE VIDÉO -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">APPLICATION</div>
+      <h1>Application réelle - Démo vidéo</h1>
+    </div>
+    <div style="flex:1;display:flex;align-items:stretch;padding-top:6px">
+      <div class="screenshot-zone" style="flex:1;width:100%;height:100%">
+        
+        <div class="sz-icon" style="font-size:48px">▶</div>
+        <div class="sz-label" style="font-size:14px">Démo vidéo complète</div>
+        <div class="sz-hint">Cliquer pour charger la vidéo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 25 - APPLICATION RÉELLE MOBILE -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">APPLICATION</div>
+      <h1>Application réelle - Mobile</h1>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div class="highlight-box" style="flex:1;margin:0;padding:8px 12px">
+        <div class="label">Accueil responsive</div>
+        <p style="font-size:11px">Calendrier dots + cards événement - zéro scroll horizontal sur mobile</p>
+      </div>
+      <div class="highlight-box" style="flex:1;margin:0;padding:8px 12px">
+        <div class="label">Profil joueur</div>
+        <p style="font-size:11px">Tables → cartes <code>data-label</code>, grille 2×2 paiement / désistement</p>
+      </div>
+      <div class="highlight-box" style="flex:1;margin:0;padding:8px 12px">
+        <div class="label">Navigation admin</div>
+        <p style="font-size:11px">Hamburger drawer slide-in - toutes les pages, tous les rôles</p>
+      </div>
+      <div class="highlight-box" style="flex:1;margin:0;padding:8px 12px">
+        <div class="label">Dashboard manager</div>
+        <p style="font-size:11px">Marquer payé directement depuis la liste - boutons en ligne sur mobile</p>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;gap:10px;padding-top:2px">
+      <div class="screenshot-zone" style="flex:1">
+        
+        <div class="sz-icon">🏠</div>
+        <div class="sz-label">Accueil - mobile</div>
+        <div class="sz-hint">Cliquer pour charger</div>
+      </div>
+      <div class="screenshot-zone" style="flex:1">
+        
+        <div class="sz-icon">👤</div>
+        <div class="sz-label">Profil joueur</div>
+        <div class="sz-hint">Cliquer pour charger</div>
+      </div>
+      <div class="screenshot-zone" style="flex:1">
+        
+        <div class="sz-icon">☰</div>
+        <div class="sz-label">Navigation admin</div>
+        <div class="sz-hint">Cliquer pour charger</div>
+      </div>
+      <div class="screenshot-zone" style="flex:1">
+        
+        <div class="sz-icon">💳</div>
+        <div class="sz-label">Marquer payé - manager</div>
+        <div class="sz-hint">Cliquer pour charger</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 26 - SYNTHÈSE -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="subtitle">APPLICATION</div>
+      <h1>Synthèse - Satisfactions, Difficultés, Perspectives</h1>
+    </div>
+    <div style="display:flex;flex-direction:row;gap:18px;justify-content:center;align-items:stretch;margin-top:18px">
+      <div style="flex:1;min-width:0;max-width:340px;background:var(--bg2);border-radius:8px;padding:16px 14px;display:flex;flex-direction:column">
+        <p style="font-size:13px;color:var(--green);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;text-align:center">Satisfactions</p>
+        <ul class="check" style="font-size:13px;line-height:1.7;margin:0 0 0 0;padding-left:18px">
+          <li>Architecture MVC from scratch - chaque ligne maîtrisée</li>
+          <li>Race condition résolue (SELECT FOR UPDATE)</li>
+          <li>Idempotence émargement + Templix atomique</li>
+          <li>5 vecteurs OWASP couverts</li>
+          <li>Application fonctionnelle livrée</li>
+        </ul>
+      </div>
+      <div style="flex:1;min-width:0;max-width:340px;background:var(--bg2);border-radius:8px;padding:16px 14px;display:flex;flex-direction:column">
+        <p style="font-size:13px;color:var(--red);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;text-align:center">Difficultés</p>
+        <ul style="font-size:13px;color:var(--light);line-height:1.7;list-style:disc;padding-left:18px;margin:0">
+          <li>Transactions concurrentes - concept nouveau, appris sur la doc InnoDB</li>
+          <li>Routing manuel - long à stabiliser, paramètres GET/POST imbriqués</li>
+          <li>Modélisation BDD - arbitrage Lieu Unique, plusieurs itérations</li>
+        </ul>
+      </div>
+      <div style="flex:1;min-width:0;max-width:340px;background:var(--bg2);border-radius:8px;padding:16px 14px;display:flex;flex-direction:column">
+          <p style="font-size:13px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;text-align:center">Fonctionnalités futures</p>
+          <table style="font-size:13px;margin-top:6px;width:100%">
+            <tr><th style="text-align:left">Évolution</th><th style="text-align:left">Priorité</th></tr>
+            <tr><td>Paiement Stripe</td><td><span class="badge badge-red">Haute</span></td></tr>
+            <tr><td>Notifications SMS/email</td><td><span class="badge badge-red">Haute</span></td></tr>
+            <tr><td>PWA mobile</td><td><span class="badge badge-gold">Moyenne</span></td></tr>
+            <tr><td>API publique JSON</td><td><span class="badge badge-gray">Basse</span></td></tr>
+          </table>
+        </div>
+      </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SLIDE 27 - MERCI -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="slide slide-title">
+    <div class="logo-line">Soutenance DWWM - RNCP 37674</div>
+    <h1 style="font-size:52px">Merci !</h1>
+    <div class="tagline" style="font-size:17px">Merci pour votre attention</div>
+    <div class="divider"></div>
+    <div class="meta" style="font-size:14px">
+      <strong>Mariami CHADUNELI</strong><br>
+      Candidate Développeur Web et Web Mobile<br><br>
+      <span style="color:var(--gold)">AGENDA LTDJ v2</span> - Le Temple du Jeu<br>
+      Stage du 5 mai au 27 juin 2025
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<!-- NAVIGATION -->
+<div id="nav">
+  <button onclick="changeSlide(-1)">◀ Précédent</button>
+  <span id="counter">1 / 29</span>
+  <button onclick="changeSlide(1)">Suivant ▶</button>
+</div>
+<div id="hint">← → flèches clavier · F pour plein écran · Échap pour quitter</div>
+<div id="fs-counter"></div>
+
+<div id="lightbox">
+  <span id="lightbox-close" onclick="closeLightbox()">✕</span>
+</div>
+
+<script>
+  function openLightbox(src, isVideo) {
+    const lb = document.getElementById('lightbox');
+    lb.querySelectorAll('img,video').forEach(e => e.remove());
+    if (isVideo) {
+      const v = document.createElement('video');
+      v.src = src; v.controls = true; v.autoplay = true;
+      v.style.cssText = 'max-width:95vw;max-height:95vh;border-radius:8px;';
+      lb.appendChild(v);
+    } else {
+      const img = document.createElement('img');
+      img.src = src;
+      lb.appendChild(img);
+    }
+    lb.classList.add('open');
+  }
+  function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    lb.classList.remove('open');
+    lb.querySelectorAll('img,video').forEach(e => e.remove());
+  }
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  // ── LOGO ENTREPRISE (haut droit) ──
+  function loadLogo(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const b64 = e.target.result;
+      localStorage.setItem('deck-logo', b64);
+      applyLogo(b64);
+    };
+    reader.readAsDataURL(file);
+  }
+  function applyLogo(src) {
+    const img = document.getElementById('logo-img');
+    const overlay = document.getElementById('logo-overlay');
+    img.src = src;
+    overlay.classList.add('has-logo');
+  }
+  const savedLogo = localStorage.getItem('deck-logo');
+  if (savedLogo) applyLogo(savedLogo);
+
+  // ── LOGO ENI (haut gauche) ──
+  function loadLogoEni(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const b64 = e.target.result;
+      localStorage.setItem('deck-logo-eni', b64);
+      applyLogoEni(b64);
+    };
+    reader.readAsDataURL(file);
+  }
+  function applyLogoEni(src) {
+    const img = document.getElementById('logo-eni-img');
+    const overlay = document.getElementById('logo-eni-overlay');
+    img.src = src;
+    overlay.classList.add('has-logo');
+  }
+  const savedLogoEni = localStorage.getItem('deck-logo-eni');
+  if (savedLogoEni) applyLogoEni(savedLogoEni);
+
+  // ── IndexedDB for large files (videos) ──────────────────
+  let idb;
+  const IDB_NAME = 'deck-media', IDB_STORE = 'zones', IDB_VER = 1;
+  function openIDB() {
+    return new Promise((res, rej) => {
+      if (idb) return res(idb);
+      const req = indexedDB.open(IDB_NAME, IDB_VER);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+      req.onsuccess = e => { idb = e.target.result; res(idb); };
+      req.onerror   = e => rej(e);
+    });
+  }
+  function idbSet(key, val) {
+    return openIDB().then(db => new Promise((res, rej) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(val, key);
+      tx.oncomplete = res; tx.onerror = rej;
+    }));
+  }
+  function idbGet(key) {
+    return openIDB().then(db => new Promise((res, rej) => {
+      const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = rej;
+    }));
+  }
+
+  function loadImg(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const zone = input.closest('.screenshot-zone');
+    const zones = Array.from(document.querySelectorAll('.screenshot-zone'));
+    const idx = zones.indexOf(zone);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      if (file.type.startsWith('video/')) {
+        // Store large files in IndexedDB
+        idbSet('sz_' + idx, dataUrl).catch(() => {});
+        // Remove from localStorage in case old small entry exists
+        localStorage.removeItem('sz_' + idx);
+      } else {
+        try { localStorage.setItem('sz_' + idx, dataUrl); } catch(e) {
+          // localStorage full - fallback to IndexedDB
+          idbSet('sz_' + idx, dataUrl).catch(() => {});
+        }
+      }
+      applyMedia(zone, dataUrl, file.type);
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function applyMedia(zone, dataUrl, type) {
+    zone.querySelectorAll('img,video').forEach(el => el.remove());
+    const isVideo = type && type.startsWith('video/');
+    if (isVideo) {
+      const v = document.createElement('video');
+      v.src = dataUrl; v.autoplay = true; v.loop = true; v.muted = true; v.controls = true;
+      v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:8px;background:#000;z-index:1;';
+      zone.appendChild(v);
+    } else {
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:contain;border-radius:8px;background:#1a1a2e;';
+      zone.appendChild(img);
+    }
+    zone.classList.add('loaded');
+    // For images: add fullscreen button. For videos: native controls handle fullscreen.
+    zone.querySelectorAll('.sz-fullscreen-btn').forEach(b => b.remove());
+    if (!isVideo) {
+      const btn = document.createElement('button');
+      btn.className = 'sz-fullscreen-btn';
+      btn.textContent = '⛶';
+      btn.title = 'Plein écran';
+      btn.onclick = (e) => { e.stopPropagation(); openLightbox(dataUrl, false); };
+      zone.appendChild(btn);
+    }
+    zone.ondblclick = null;
+    // Keep the file input so media can always be replaced (e.g., video -> image).
+    // Lock: remove file input after first upload
+    if (zone.hasAttribute('data-lock')) {
+      const inp = zone.querySelector('input[type="file"]');
+      if (inp) inp.remove();
+    }
+  }
+
+  async function restoreImages() {
+    const zones = document.querySelectorAll('.screenshot-zone');
+    for (let idx = 0; idx < zones.length; idx++) {
+      // Try localStorage first (images), then IndexedDB (videos)
+      let dataUrl = localStorage.getItem('sz_' + idx);
+      if (!dataUrl) dataUrl = await idbGet('sz_' + idx).catch(() => null);
+      if (dataUrl) applyMedia(zones[idx], dataUrl, dataUrl.startsWith('data:video') ? 'video/' : 'image/');
+    }
+  }
+  restoreImages();
+
+  const slides= document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let current  = 0;
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    const label = (current + 1) + ' / ' + total;
+    document.getElementById('counter').textContent = label;
+    document.getElementById('fs-counter').textContent = label;
+    const pct = ((current + 1) / total * 100).toFixed(1);
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  function scaleDeck() {
+    const deck = document.getElementById('deck');
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      // Use innerWidth/Height - reliable in fullscreen on any display (TV, projector)
+      const scaleX = window.innerWidth  / 960;
+      const scaleY = window.innerHeight / 540;
+      const scale  = Math.min(scaleX, scaleY);
+      deck.style.transform       = `scale(${scale})`;
+      deck.style.transformOrigin = 'center center';
+      document.getElementById('fs-counter').style.display = 'block';
+    } else {
+      deck.style.transform = '';
+      document.getElementById('fs-counter').style.display = 'none';
+    }
+  }
+
+  function toggleFS() {
+    if (!document.fullscreenElement) {
+      const el  = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+      if (req) req.call(el).then(() => scaleDeck()).catch(() => {});
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+      if (exit) exit.call(document);
+    }
+  }
+
+  document.addEventListener('fullscreenchange',       scaleDeck);
+  document.addEventListener('webkitfullscreenchange', scaleDeck);
+  window.addEventListener('resize', scaleDeck);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') changeSlide(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  changeSlide(-1);
+    if (e.key === 'f' || e.key === 'F') toggleFS();
+    if (e.key === 'Escape' && document.fullscreenElement) document.exitFullscreen();
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.getElementById('deck').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+  document.getElementById('deck').addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) changeSlide(dx < 0 ? 1 : -1);
+  });
+
+  // Init progress bar
+  document.getElementById('progress-fill').style.width = (1/total*100).toFixed(1) + '%';
+</script>
+
+</body>
+</html>

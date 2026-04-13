@@ -389,13 +389,15 @@
 
     <div id="logo-eni-overlay">
       <img id="logo-eni-img" src="" alt="Logo ENI" onclick="document.getElementById('logo-eni-input').click()">
-      <span id="logo-eni-placeholder" onclick="document.getElementById('logo-eni-input').click()">+ Logo ENI</span>
+      <img id="logo-eni-img" src="eni.png" alt="Logo ENI" style="display:block;" onclick="document.getElementById('logo-eni-input').click()">
+      <span id="logo-eni-placeholder" onclick="document.getElementById('logo-eni-input').click()" style="display:none;">+ Logo ENI</span>
       <input id="logo-eni-input" type="file" accept="image/*" onchange="loadLogoEni(this)">
     </div>
 
     <div id="logo-overlay">
       <img id="logo-img" src="" alt="Logo" onclick="document.getElementById('logo-input').click()">
-      <span id="logo-placeholder" onclick="document.getElementById('logo-input').click()">+ Logo entreprise</span>
+      <img id="logo-img" src="logo_carre_transp.png" alt="Logo entreprise" style="display:block;" onclick="document.getElementById('logo-input').click()">
+      <span id="logo-placeholder" onclick="document.getElementById('logo-input').click()" style="display:none;">+ Logo entreprise</span>
       <input id="logo-input" type="file" accept="image/*" onchange="loadLogo(this)">
     </div>
 
